@@ -1,0 +1,9 @@
+export const userRequests = {
+    login: '/api/auth/login',
+    logout: '/api/auth/logout',
+    register: '/api/auth/register'
+}
+
+export const postRequests = {
+    fetcahAllPosts: '/api/posts',
+}

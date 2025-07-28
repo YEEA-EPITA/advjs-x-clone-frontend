@@ -1,25 +1,32 @@
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import {Route, Routes} from "react-router-dom";
+import LoginPage from "./pages/LoginPage";
+import HomePage from "./pages/HomePage";
+import PostDetailsPage from "./pages/PostDetailsPage";
+import NotFoundPage from "./pages/NotFoundPage";
+import PublicRoute from "./routes/PublicRoute";
+import PrivateRoute from "./routes/PrivateRoute";
+import { ThemeProvider } from "./context/ThemeContext";
 
-function App() {
+const App = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+    <ThemeProvider>
+      <Routes>
+        <Route element={<PublicRoute />}>
+          <Route path="/auth/login" element={<LoginPage />} />
+        </Route>
+        <Route element={<PrivateRoute />}> 
+          <Route path="/home" element={<HomePage />} />
+        </Route>
+        <Route element={<PrivateRoute />}>
+          <Route path="/post/:postId" element={<PostDetailsPage />} />
+        </Route>
+        <Route path="*" element={<NotFoundPage />}/>
+      </Routes>
+    </ThemeProvider>
+    </>
   );
-}
+};
 
 export default App;
