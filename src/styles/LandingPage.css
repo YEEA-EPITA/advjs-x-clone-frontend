@@ -26,7 +26,7 @@ html {
 .x-logo {
   width: 300px;
   max-width: 90%;
-} */
+} 
 
 .landing-container {
   display: flex;
@@ -218,3 +218,4 @@ html {
 .footer-copy {
   margin-top: 5px;
 }
+

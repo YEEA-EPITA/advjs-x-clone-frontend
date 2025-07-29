@@ -8,7 +8,7 @@ const LandingPage = () => {
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
-
+  
   return (
     <div className="page-wrapper">
       <div className="container">
@@ -42,12 +42,6 @@ const LandingPage = () => {
             By signing up, you agree to the <a href="#">Terms of Service</a> and{" "}
             <a href="#">Privacy Policy</a>, including <a href="#">Cookie Use</a>.
           </p>
-
-          {/* <div className="signin-container">
-            <button className="signin-btn" onClick={() => navigate("/auth/login")}>
-              Sign in
-            </button>
-          </div> */}
 
           <div className="signin-container">
             <button className="signin-btn" onClick={() => setShowLoginModal(true)}>
