@@ -2,10 +2,12 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/LandingPage.css";
 import RegisterModal from "../components/RegisterModal";
+import LoginModal from "../components/LoginModal";
 
 const LandingPage = () => {
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
   return (
     <div className="page-wrapper">
@@ -41,8 +43,14 @@ const LandingPage = () => {
             <a href="#">Privacy Policy</a>, including <a href="#">Cookie Use</a>.
           </p>
 
-          <div className="signin-container">
+          {/* <div className="signin-container">
             <button className="signin-btn" onClick={() => navigate("/auth/login")}>
+              Sign in
+            </button>
+          </div> */}
+
+          <div className="signin-container">
+            <button className="signin-btn" onClick={() => setShowLoginModal(true)}>
               Sign in
             </button>
           </div>
@@ -50,6 +58,8 @@ const LandingPage = () => {
           {showModal && (
             <RegisterModal onClose={() => setShowModal(false)} />
           )}
+
+          {showLoginModal && <LoginModal onClose={() => setShowLoginModal(false)} />}
         </div>
       </div>
 

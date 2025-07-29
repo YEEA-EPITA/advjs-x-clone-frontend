@@ -1,4 +1,4 @@
-import "../styles/RegisterModal-v2.css";
+import "../styles/RegisterModal.css";
 import RegisterForm from "./RegisterForm";
 
 const RegisterModal = ({ onClose }) => {
