@@ -60,12 +60,6 @@ export const RegisterForm = () => {
         setMessage("Registration failed.");
       }
     } catch (err) {
-      //  const errorMsg = 
-      //   err?.response?.data?.message ||
-      //   err?.response?.data?.errors?.[0]?.message ||
-      //   "Error connecting to server.";
-
-      // setMessage(errorMsg);
       const validationErrors = err?.response?.data?.errors;
 
       if (Array.isArray(validationErrors)) {

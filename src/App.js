@@ -1,31 +1,37 @@
-import React from "react";
-import {Route, Routes} from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
+
 import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
 import HomePage from "./pages/HomePage";
 import PostDetailsPage from "./pages/PostDetailsPage";
 import NotFoundPage from "./pages/NotFoundPage";
+
 import PublicRoute from "./routes/PublicRoute";
 import PrivateRoute from "./routes/PrivateRoute";
+import LandingPage from "./pages/LandingPage";
 import { ThemeProvider } from "./context/ThemeContext";
 
 const App = () => {
   return (
-    <>
     <ThemeProvider>
       <Routes>
+        {/* Public Routes */}
         <Route element={<PublicRoute />}>
+          <Route path="/auth" element={<LandingPage />} /> 
           <Route path="/auth/login" element={<LoginPage />} />
+          <Route path="/auth/register" element={<RegisterPage />} />
         </Route>
-        <Route element={<PrivateRoute />}> 
-          <Route path="/home" element={<HomePage />} />
-        </Route>
+
+        {/* Private Routes */}
         <Route element={<PrivateRoute />}>
+          <Route path="/home" element={<HomePage />} />
           <Route path="/post/:postId" element={<PostDetailsPage />} />
         </Route>
-        <Route path="*" element={<NotFoundPage />}/>
+
+        {/* Fallback */}
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </ThemeProvider>
-    </>
   );
 };
 
