@@ -1,29 +1,29 @@
 import React, { useState } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'; 
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { xcloneApi } from '../constants/axios';
 import { userRequests } from '../constants/requests';
+import '../styles/RegisterForm.css';
 
-export const RegisterForm = () => {
+const RegisterForm = () => {
   const [showPass, setShowPass] = useState(false);
   const [showConfirmPass, setShowConfirmPass] = useState(false);
   const [message, setMessage] = useState([]);
-
   const [user, setUser] = useState({
     email: "",
     username: "",
-    displayName: "", 
+    displayName: "",
     password: "",
     confirmPassword: ""
   });
 
-  const togglePassword = (event) => {
-    event.preventDefault();
+  const togglePassword = (e) => {
+    e.preventDefault();
     setShowPass(!showPass);
   };
 
-  const toggleConfirmPassword = (event) => {
-    event.preventDefault();
+  const toggleConfirmPassword = (e) => {
+    e.preventDefault();
     setShowConfirmPass(!showConfirmPass);
   };
 
@@ -31,127 +31,91 @@ export const RegisterForm = () => {
     e.preventDefault();
 
     if (user.password !== user.confirmPassword) {
-      setMessage("Passwords do not match.");
+      setMessage(["Passwords do not match."]);
       return;
     }
 
     const { email, username, password, displayName } = user;
-
-    const payload = {
-      email,
-      username,
-      password,
-      displayName  
-    };
+    const payload = { email, username, password, displayName };
 
     try {
       const res = await xcloneApi.post(userRequests.register, payload);
-
       if (res.status === 200) {
-        setMessage("Successfully Registered.");
-        setUser({
-          email: "",
-          username: "",
-          displayName: "",
-          password: "",
-          confirmPassword: ""
-        });
+        setMessage(["Successfully Registered."]);
+        setUser({ email: "", username: "", displayName: "", password: "", confirmPassword: "" });
       } else {
-        setMessage("Registration failed.");
+        setMessage(["Registration failed."]);
       }
     } catch (err) {
       const validationErrors = err?.response?.data?.errors;
-
       if (Array.isArray(validationErrors)) {
-        const allMessages = validationErrors.map(err => err.message);
-        setMessage(allMessages); 
+        setMessage(validationErrors.map(err => err.message));
       } else {
-        const fallbackMsg = err?.response?.data?.message || "Error connecting to server.";
-        setMessage([fallbackMsg]);
+        const fallback = err?.response?.data?.message || "Server error.";
+        setMessage([fallback]);
       }
     }
   };
 
   return (
-    <React.Fragment>
-      <div className='inputs-container'>
-        <div className='input-container'> 
-          <label className='email'>Email</label>
+    <form onSubmit={handleSubmit}>
+      {["email", "username", "displayName"].map((field) => (
+        <div className="form-group" key={field}>
           <input
-            type='text'
-            className='email'
-            value={user.email}
-            onChange={(e) => setUser({ ...user, email: e.target.value })}
+            type="text"
+            id={field}
+            className="floating-input"
+            value={user[field]}
+            onChange={(e) => setUser({ ...user, [field]: e.target.value })}
+            placeholder=" "
+            required
           />
+          <label htmlFor={field}>{field === "displayName" ? "Display Name" : field.charAt(0).toUpperCase() + field.slice(1)}</label>
         </div>
-      </div>
+      ))}
 
-      <div className='input-container'> 
-        <label>Username</label>
-        <input
-          type='text'
-          value={user.username}
-          onChange={(e) => setUser({ ...user, username: e.target.value })}
-        />
-      </div>
-
-      <div className='input-container'> 
-        <label>Display Name</label>
-        <input
-          type='text'
-          value={user.displayName}
-          onChange={(e) => setUser({ ...user, displayName: e.target.value })}
-        />
-      </div>
-
-      <div className='input-container' style={{ position: "relative" }}> 
-        <label>Password</label>
+      <div className="form-group password-group">
         <input
           type={showPass ? "text" : "password"}
+          id="password"
+          className="floating-input"
           value={user.password}
           onChange={(e) => setUser({ ...user, password: e.target.value })}
+          placeholder=" "
+          required
         />
-        <span onClick={togglePassword} style={{ cursor: "pointer" }}>
-          {showPass ? (
-            <FontAwesomeIcon icon={faEye} className='customIcon' />
-          ) : (
-            <FontAwesomeIcon icon={faEyeSlash} className='customIcon' />
-          )}
+        <label htmlFor="password">Password</label>
+        <span className="toggle-icon" onClick={togglePassword}>
+          <FontAwesomeIcon icon={showPass ? faEye : faEyeSlash} />
         </span>
       </div>
 
-      <div className='input-container' style={{ position: "relative" }}>
-        <label>Confirm Password</label>
+      <div className="form-group password-group">
         <input
           type={showConfirmPass ? "text" : "password"}
+          id="confirmPassword"
+          className="floating-input"
           value={user.confirmPassword}
           onChange={(e) => setUser({ ...user, confirmPassword: e.target.value })}
+          placeholder=" "
+          required
         />
-        <span onClick={toggleConfirmPassword} style={{ cursor: "pointer" }}>
-          {showConfirmPass ? (
-            <FontAwesomeIcon icon={faEye} className='customIcon' />
-          ) : (
-            <FontAwesomeIcon icon={faEyeSlash} className='customIcon' />
-          )}
+        <label htmlFor="confirmPassword">Confirm Password</label>
+        <span className="toggle-icon" onClick={toggleConfirmPassword}>
+          <FontAwesomeIcon icon={showConfirmPass ? faEye : faEyeSlash} />
         </span>
       </div>
 
-      <button type="submit" className='submit' onClick={handleSubmit}>
-        Submit
-      </button>
+      <button type="submit" className="submit-btn">Submit</button>
 
-      {/* <span style={{ display: "flex", justifyContent: "center", marginTop: "20px" }}>
-        {message}
-      </span> */}
       {message.length > 0 && (
-        <div style={{ marginTop: "20px", textAlign: "center" }}>
+        <div className="message-area">
           {message.map((msg, i) => (
             <div key={i}>• {msg}</div>
           ))}
         </div>
       )}
-
-    </React.Fragment>
+    </form>
   );
 };
 

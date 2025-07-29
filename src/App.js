@@ -1,7 +1,7 @@
 import { Route, Routes } from "react-router-dom";
 
 import LoginPage from "./pages/LoginPage";
-import RegisterPage from "./pages/RegisterPage";
+// import RegisterPage from "./pages/RegisterPage";
 import HomePage from "./pages/HomePage";
 import PostDetailsPage from "./pages/PostDetailsPage";
 import NotFoundPage from "./pages/NotFoundPage";
@@ -19,7 +19,7 @@ const App = () => {
         <Route element={<PublicRoute />}>
           <Route path="/auth" element={<LandingPage />} /> 
           <Route path="/auth/login" element={<LoginPage />} />
-          <Route path="/auth/register" element={<RegisterPage />} />
+          {/* <Route path="/auth/register" element={<RegisterPage />} /> */}
         </Route>
 
         {/* Private Routes */}
