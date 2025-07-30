@@ -25,12 +25,25 @@
   position: absolute;
   top: 12px;
   right: 12px;
-  font-size: 20px;
+  font-size: 10px;
   background: transparent;
   border: none;
-  color: #555;
+  color: #1da1f2 !important;
   cursor: pointer;
-  z-index: 999;
+  z-index: 1;
+
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%; 
+  background-color: #f6f3f3 !important;;
+}
+
+.close-button:hover {
+  color: #1da1f2; 
 }
 
 .modal-logo {
