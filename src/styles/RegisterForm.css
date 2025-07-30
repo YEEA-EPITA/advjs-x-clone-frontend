@@ -66,3 +66,9 @@
   font-size: 14px;
   text-align: center;
 }
+
+.error-msg {
+  color: rgb(226, 113, 113);
+  font-size: 0.9rem;
+  margin-top: 4px;
+}

@@ -40,8 +40,7 @@ const LandingPage = () => {
 
           <p className="tos-text">
             By signing up, you agree to the <a href="#">Terms of Service</a> and{" "}
-            <a href="#">Privacy Policy</a>, including <a href="#">Cookie Use</a>.
-          </p>
+            <a href="#">Privacy Policy</a>, including <a href="#">Cookie Use</a>.</p>
 
           <div className="signin-container">
             <button className="signin-btn" onClick={() => setShowLoginModal(true)}>
