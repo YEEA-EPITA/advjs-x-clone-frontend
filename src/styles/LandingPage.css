@@ -6,52 +6,41 @@ html {
   font-family: Arial, sans-serif;
 }
 
-.container {
+.page-wrapper {
   display: flex;
-  flex-direction: row;
-  justify-content: space-evenly;
-  align-items: center;
-  flex-wrap: wrap;
-  min-height: 80vh; 
+  flex-direction: column;
+  min-height: 100vh;
 }
 
-.logo-section {
-  flex: 1;
+.container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;        
+  height: 100vh;
+  gap: 4rem;
+  padding: 0 6rem;
+}
+
+.logo-section,
+.auth-section {
   display: flex;
-  align-items: center;
   justify-content: center;
-  padding: 2rem;
+  align-items: center;
+  height: 100%; 
+}
+
+.auth-section {
+  flex-direction: column;
+  align-items: flex-start;
+  max-width: 400px;
+  width: 100%;
 }
 
 .x-logo {
   width: 300px;
   max-width: 90%;
-} 
-
-.landing-container {
-  display: flex;
-  flex-direction: row;
-  height: 100vh;
-  background-color: #ffffff;
-  justify-content: center;
-  align-items: center;
-  gap: 0px; 
-}
-.logo-section {
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding-left: 10em; 
-  padding-right: 3rem; 
-}
-
-.x-logo {
-  width: 300px; 
-  max-width: 100%;
   height: auto;
   object-fit: contain;
-  margin-left: 20px; 
 }
 
 .title {
@@ -67,9 +56,8 @@ html {
 
 .social-button {
   width: 100%;
-  max-width: 300px;
   padding: 12px;
-  margin: 2px 0;
+  margin: 6px 0;
   border: 1px solid #ccc;
   border-radius: 9999px;
   background-color: #fff;
@@ -94,49 +82,14 @@ html {
   color: white;
   border: none;
   width: 100%;
-  max-width: 300px;
   padding: 12px;
   border-radius: 9999px;
   font-weight: bold;
-  margin: 12px 0;
+  margin: 16px 0;
 }
 
 .create-account-btn:hover {
   background-color: #1a91da;
-}
-
-.divider {
-  margin: 10px 0;
-  color: #888;
-}
-
-.tos-text {
-  font-size: 12px;
-  color: #555;
-  text-align: center;
-  margin-top: 16px;
-  max-width: 300px;
-  width: 100%;
-}
-
-.tos-text,
-.login-text {
-  font-size: 12px;
-  color: #555;
-  text-align: center;
-  margin-top: 16px;
-}
-
-.tos-text a,
-.login-text .link {
-  color: #1da1f2;
-  cursor: pointer;
-  text-decoration: none;
-}
-
-.tos-text a:hover,
-.login-text .link:hover {
-  text-decoration: underline;
 }
 
 .divider-with-text {
@@ -146,7 +99,6 @@ html {
   margin: 16px 0;
   gap: 8px;
   width: 100%;
-  max-width: 300px;
 }
 
 .divider-with-text .line {
@@ -159,20 +111,37 @@ html {
   font-size: 13px;
   color: #657786;
   white-space: nowrap;
-  transform: translateY(1px); 
+  transform: translateY(1px);
+}
+
+.tos-text {
+  font-size: 12px;
+  color: #555;
+  text-align: left;
+  margin-top: 16px;
+  max-width: 100%;
+  line-height: 1.5;
+}
+
+.tos-text a {
+  color: #1da1f2;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.tos-text a:hover {
+  text-decoration: underline;
 }
 
 .signin-container {
-  margin-top: 12px;
+  margin-top: 16px;
   width: 100%;
-  max-width: 300px;
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
 }
 
 .signin-btn {
   width: 100%;
-  max-width: 300px;
   padding: 12px;
   border: 1px solid #ccc;
   border-radius: 9999px;
@@ -180,7 +149,6 @@ html {
   font-weight: bold;
   color: #1da1f2;
   text-align: center;
-  margin: 2px;
 }
 
 .signin-btn:hover {
@@ -191,21 +159,25 @@ html {
   text-align: center;
   font-size: 12px;
   color: #657786;
-  margin-top: 20px; 
+  margin-top: auto;
   padding: 20px 0;
   width: 100%;
+  background-color: #ffffff;
 }
 
 .footer-links {
   display: flex;
   flex-wrap: nowrap;
-  overflow-x: auto;  
+  overflow-x: auto;
   justify-content: center;
   gap: 16px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
 }
 
 .footer-links li a {
-  color: #657786;  
+  color: #657786;
   white-space: nowrap;
   text-decoration: none;
   font-size: 12px;
@@ -215,7 +187,32 @@ html {
   text-decoration: underline;
 }
 
-.footer-copy {
-  margin-top: 5px;
-}
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+    padding: 2rem;
+    gap: 2rem;
+  }
 
+  .logo-section {
+    justify-content: center;
+  }
+
+  .auth-section {
+    align-items: center;
+    text-align: center;
+  }
+
+  .signin-container {
+    justify-content: center;
+  }
+
+  .tos-text {
+    text-align: center;
+  }
+
+  .x-logo {
+    width: 200px;
+    margin: 0 auto;
+  }
+}
