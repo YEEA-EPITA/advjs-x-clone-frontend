@@ -6,7 +6,7 @@ import NotFoundPage from "./pages/NotFoundPage";
 
 import PublicRoute from "./routes/PublicRoute";
 import PrivateRoute from "./routes/PrivateRoute";
-import LandingPage from "./pages/LandingPage";
+import AuthPage from "./pages/AuthPage";
 import { ThemeProvider } from "./context/ThemeContext";
 
 const App = () => {
@@ -15,7 +15,7 @@ const App = () => {
       <Routes>
         {/* Public Routes */}
         <Route element={<PublicRoute />}>
-          <Route path="/auth" element={<LandingPage />} /> 
+          <Route path="/auth" element={<AuthPage />} /> 
         </Route>
 
         {/* Private Routes */}

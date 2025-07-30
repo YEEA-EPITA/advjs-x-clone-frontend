@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "../styles/LandingPage.css";
+import "../styles/AuthPage.css";
 import RegisterModal from "../components/RegisterModal";
 import LoginModal from "../components/LoginModal";
 
-const LandingPage = () => {
+const AuthPage = () => {
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
@@ -72,4 +72,4 @@ const LandingPage = () => {
   );
 };
 
-export default LandingPage;
+export default AuthPage;
