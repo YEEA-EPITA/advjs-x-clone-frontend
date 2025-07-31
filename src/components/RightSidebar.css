@@ -1,0 +1,110 @@
+/* RightSidebar.css */
+
+.right-sidebar {
+  width: 350px;
+  padding: 20px;
+  margin-left: auto;
+}
+
+.trends-widget,
+.suggestions-widget {
+  background-color: var(--bg-secondary);
+  border-radius: 16px;
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+
+.trends-widget h3,
+.suggestions-widget h3 {
+  padding: 20px;
+  margin: 0;
+  font-size: 20px;
+  font-weight: 800;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.trend-item {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-color);
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.trend-item:hover {
+  background-color: var(--bg-hover-light);
+}
+
+.trend-item:last-child {
+  border-bottom: none;
+}
+
+.trend-category {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 2px;
+}
+
+.trend-name {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+
+.trend-posts {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.suggestion-item {
+  display: flex;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-color);
+  gap: 12px;
+}
+
+.suggestion-item:last-child {
+  border-bottom: none;
+}
+
+.suggestion-avatar img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+.suggestion-info {
+  flex: 1;
+}
+
+.suggestion-name {
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.suggestion-username {
+  color: var(--text-secondary);
+  font-size: 15px;
+}
+
+.follow-button {
+  background-color: var(--text-primary);
+  color: var(--bg-primary);
+  border: none;
+  border-radius: 20px;
+  padding: 8px 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.follow-button:hover {
+  opacity: 0.9;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .right-sidebar {
+    display: none;
+  }
+}

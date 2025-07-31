@@ -1,0 +1,71 @@
+/* MainLayout.css */
+
+/* CSS Variables for Theme Support */
+.main-layout {
+  /* Dark Theme (Default) */
+  --bg-primary: #000;
+  --bg-secondary: #16181c;
+  --bg-hover: #181818;
+  --bg-hover-light: rgba(255, 255, 255, 0.03);
+  --border-color: #2f3336;
+  --text-primary: #fff;
+  --text-secondary: #71767b;
+  --accent-blue: #1d9bf0;
+  --accent-blue-hover: #1a8cd8;
+  --accent-red: #f91880;
+  --accent-green: #00ba7c;
+  
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Light Theme Variables */
+.main-layout.light {
+  --bg-primary: #fff;
+  --bg-secondary: #f7f9fa;
+  --bg-hover: #f7f9fa;
+  --bg-hover-light: rgba(0, 0, 0, 0.03);
+  --border-color: #eff3f4;
+  --text-primary: #0f1419;
+  --text-secondary: #536471;
+  --accent-blue: #1d9bf0;
+  --accent-blue-hover: #1a8cd8;
+  --accent-red: #f91880;
+  --accent-green: #00ba7c;
+}
+
+.layout-content {
+  display: flex;
+  max-width: 1200px;
+  margin: 0 auto;
+  min-height: 100vh;
+}
+
+.main-content {
+  flex: 1;
+  margin-left: 275px;
+  border-right: 1px solid var(--border-color);
+  min-height: 100vh;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .main-content {
+    margin-right: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    margin-left: 68px;
+  }
+}
+
+@media (max-width: 600px) {
+  .main-content {
+    margin-left: 0;
+  }
+}

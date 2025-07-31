@@ -1,7 +1,6 @@
 import { Route, Routes } from "react-router-dom";
 
 import HomePage from "./pages/HomePage";
-import PostDetailsPage from "./pages/PostDetailsPage";
 import NotFoundPage from "./pages/NotFoundPage";
 
 import PublicRoute from "./routes/PublicRoute";
@@ -21,7 +20,6 @@ const App = () => {
         {/* Private Routes */}
         <Route element={<PrivateRoute />}>
           <Route path="/home" element={<HomePage />} />
-          <Route path="/post/:postId" element={<PostDetailsPage />} />
         </Route>
 
         {/* Fallback */}
