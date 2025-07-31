@@ -6,8 +6,6 @@ const INITIAL_STATE = {
     user: JSON.parse(localStorage.getItem("user"))
 }
 
-console.log(INITIAL_STATE)
-
 // Create a context to share app state across components
 export const AppStateContext = createContext(INITIAL_STATE)
 

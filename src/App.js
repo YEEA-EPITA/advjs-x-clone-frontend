@@ -7,7 +7,9 @@ import NotFoundPage from "./pages/NotFoundPage";
 import PublicRoute from "./routes/PublicRoute";
 import PrivateRoute from "./routes/PrivateRoute";
 import AuthPage from "./pages/AuthPage";
+import ComposePostPage from "./pages/ComposePostPage";
 import { ThemeProvider } from "./context/ThemeContext";
+
 
 const App = () => {
   return (
@@ -22,6 +24,7 @@ const App = () => {
         <Route element={<PrivateRoute />}>
           <Route path="/home" element={<HomePage />} />
           <Route path="/post/:postId" element={<PostDetailsPage />} />
+          <Route path="/compose/post" element={<ComposePostPage />} />
         </Route>
 
         {/* Fallback */}

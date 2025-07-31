@@ -1,5 +1,5 @@
 import "../styles/LoginModal.css";
-import LoginForm from "./LoginForm"; // ✅ default import일 때만
+import LoginForm from "./LoginForm"; 
 
 const LoginModal = ({ onClose }) => {
   return (

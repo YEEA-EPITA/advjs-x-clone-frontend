@@ -38,6 +38,9 @@ const LoginForm = () => {
     try {
       const res = await xcloneApi.post(userRequests.login, { email, password });
 
+      const token = res.data.body.token;
+      const username = res.data.body.user.username;
+
       dispatch({
         type: "Login",
         payload: {
@@ -47,6 +50,7 @@ const LoginForm = () => {
         },
       });
 
+      localStorage.setItem('token', token);
       navigate("/home");
     } catch (err) {
       setMessage(err.response?.data?.message || "Login failed");
