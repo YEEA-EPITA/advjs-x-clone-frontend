@@ -205,7 +205,9 @@ const HomePage = () => {
           posts.map((post) => (
             <div key={post.id} className="post">
               <div className="compose-avatar">
-                <div className="avatar-placeholder">{firstAlphabet}</div>
+                <div className="avatar-placeholder">
+                  {post?.username.charAt(0)}
+                </div>
               </div>
               <div className="post-content">
                 <div className="post-header">
