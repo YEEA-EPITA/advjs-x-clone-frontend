@@ -1,25 +1,30 @@
 const AppStateReducer = (state, action) => {
-    switch (action.type) {
-        case "Login": {
-            return {
-                ...state,
-                isAuthenticated: true,
-                user: action.payload
-            }
-        }
+  switch (action.type) {
+    case "Login":
+      return {
+        ...state,
+        isAuthenticated: true,
+        user: action.payload,
+      };
 
-        case "Logout": {
-            localStorage.removeItem("user")
-            
-            return {
-                isAuthenticated: false,
-                user: null
-            }
-        }
+    case "Logout":
+      localStorage.removeItem("user");
+      return {
+        ...state,
+        isAuthenticated: false,
+        user: null,
+        socket: null,
+      };
 
-        default: 
-            return state
-    }
-}
+    case "SET_SOCKET":
+      return {
+        ...state,
+        socket: action.payload,
+      };
+
+    default:
+      return state;
+  }
+};
 
 export default AppStateReducer;

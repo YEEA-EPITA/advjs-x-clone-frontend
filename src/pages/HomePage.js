@@ -14,6 +14,8 @@ const HomePage = () => {
   const { appState } = useAppStateContext();
   const firstAlphabet = appState.user?.email?.charAt(0);
 
+  const socket = appState.socket;
+
   useEffect(() => {
     const fetchLiveFeeds = async () => {
       try {
@@ -74,6 +76,19 @@ const HomePage = () => {
 
     fetchLiveFeeds();
   }, []);
+
+  // Socket listener for live feed updates
+  useEffect(() => {
+    if (!socket) return;
+
+    socket.on("new_feed", (data) => {
+      console.log("Live feed:", data);
+    });
+
+    return () => {
+      socket.off("new_feed");
+    };
+  }, [socket]);
 
   const formatTimeAgo = (dateString) => {
     const now = new Date();
@@ -256,6 +271,9 @@ const HomePage = () => {
                   <div
                     className="action-item"
                     onClick={() => handleLike(post.id)}
+                    style={{
+                      color: post.likes > 0 ? "var(--accent-red)" : "inherit",
+                    }}
                   >
                     <i className="fas fa-heart"></i>
                     <span>{post.likes}</span>
