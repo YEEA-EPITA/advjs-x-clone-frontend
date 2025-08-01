@@ -6,6 +6,7 @@ export const userRequests = {
 
 export const postRequests = {
     fetcahAllPosts: '/api/posts',
+    createPost: '/api/posts',
     trendingHashtags: '/api/posts/trending/hashtags',
     liveFeeds: '/api/posts/live-feeds'
 }

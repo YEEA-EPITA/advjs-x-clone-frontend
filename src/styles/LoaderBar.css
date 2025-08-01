@@ -1,0 +1,21 @@
+.loader-bar {
+  position: absolute;    
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: 100%;
+  background: linear-gradient(to right, #1DA1F2 0%, #1DA1F2 50%, transparent 50%);
+  background-size: 200% 100%;
+  animation: slide 1s linear infinite;
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+}
+
+@keyframes slide {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}

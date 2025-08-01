@@ -52,11 +52,15 @@ const LoginForm = () => {
       // Store in localStorage directly
       localStorage.setItem("user", JSON.stringify(userData));
 
+      const token = res.data.body.token;
+      const username = res.data.body.user.username;
+
       dispatch({
         type: "Login",
         payload: userData,
       });
 
+      localStorage.setItem('token', token);
       navigate("/home");
     } catch (err) {
       setMessage(err.response?.data?.message || "Login failed");

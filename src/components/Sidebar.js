@@ -4,7 +4,7 @@ import useAppStateContext from "../hooks/useAppStateContext";
 import { useTheme } from "../context/ThemeContext";
 import "./Sidebar.css";
 
-const Sidebar = () => {
+const Sidebar = ({ onPostClick }) => {
   const navigate = useNavigate();
   const { appState, dispatch } = useAppStateContext();
   const { theme, toggleTheme } = useTheme();
@@ -56,7 +56,16 @@ const Sidebar = () => {
           <span>{theme === "dark" ? "Light Mode" : "Dark Mode"}</span>
         </div>
 
-        <button className="post-button">Post</button>
+        <button
+        className="post-button"
+        onClick={() => {
+          console.log("Post button clicked in Sidebar");
+          onPostClick?.();
+        }}
+      >
+        Post
+      </button>
+
 
         <div className="user-profile">
           <div className="user-info">
@@ -77,6 +86,7 @@ const Sidebar = () => {
           </button>
         </div>
       </div>
+      
     </div>
   );
 };
