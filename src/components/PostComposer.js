@@ -3,6 +3,7 @@ import { useDispatch } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import '../styles/PostComposer.css';
 import { createPost } from '../store/postSlice'; 
+import LoaderBar from './LoaderBar';
 import {
   faGlobe,
   faImage,
@@ -17,6 +18,7 @@ const PostComposer = ({ onClose }) => {
   const [mediaFile, setMediaFile] = useState(null);
   const [showDropdown, setShowDropdown] = useState(false);
   const [selectedAudience, setSelectedAudience] = useState('Everyone');
+  const [isPosting, setIsPosting] = useState(false);
   const audienceOptions = ['Everyone', 'Followers', 'Only Me'];
   const fileInputRef = useRef(null);
   const dispatch = useDispatch();
@@ -26,17 +28,27 @@ const PostComposer = ({ onClose }) => {
     setShowDropdown(false);
   };
 
-  const handlePost = () => {
+  const handlePost = async () => {
+    if (!content.trim()) return alert("What’s happening?");
+    setIsPosting(true);
+
     const formData = new FormData();
     formData.append('content', content);
     if (mediaFile) formData.append('media', mediaFile);
-    formData.append('location', 'Paris');  // TODO: Replace with actual location input
+    formData.append('location', 'Paris');
 
-    dispatch(createPost({ content, mediaFile, location: 'Paris'}));
-    setContent('');
-    setMediaFile(null);
-    onClose?.();
-  };
+    try {
+      await dispatch(createPost({ content, mediaFile, location: 'Paris' }));
+      setContent('');
+      setMediaFile(null);
+      onClose?.();
+    } catch (err) {
+      console.error('Post failed', err);
+    } finally {
+      setIsPosting(false);
+    }
+};
+
 
   return (
     <div className="composer-modal">
@@ -104,7 +116,8 @@ const PostComposer = ({ onClose }) => {
         </div>
         <button className="submit-btn" onClick={handlePost}>Post</button>
       </div>
-    </div>
+      {isPosting && <LoaderBar />}
+    </div>    
   );
 };
 
