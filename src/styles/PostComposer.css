@@ -283,3 +283,63 @@
   margin-top: 4px;
   margin-left: 4px;
 }
+
+/* Dark mode overrides */
+body.dark .composer-modal {
+  background-color: #1c1c1c;
+  color: #e4e6eb;
+}
+
+body.dark .composer-textarea {
+  background-color: #252424;
+  color: #e4e6eb;
+}
+
+body.dark .composer-textarea::placeholder {
+  color: #888;
+}
+
+body.dark .audience-dropdown {
+  background-color: #2c2c2c;
+  border-color: #555;
+  color: #f0f0f0;
+}
+
+body.dark .audience-dropdown li:hover {
+  background-color: #3a3a3a;
+}
+
+body.dark .audience-toggle {
+  border-color: #555;
+  color: #1da1f2;
+}
+
+body.dark .poll-section {
+  background-color: #2a2a2a;
+}
+
+body.dark .poll-label,
+body.dark .poll-duration-item label {
+  color: #ccc;
+}
+
+body.dark .poll-input,
+body.dark .poll-duration-item input {
+  background: #1e1e1e;
+  color: #f0f0f0;
+  border: 1px solid #555;
+}
+
+body.dark .location-display,
+body.dark .reply-status {
+  color: #1da1f2;
+}
+
+body.dark .submit-btn {
+  background-color: #1da1f2;
+  color: white;
+}
+
+body.dark .composer-overlay {
+  background-color: rgba(0, 0, 0, 0.7);
+}

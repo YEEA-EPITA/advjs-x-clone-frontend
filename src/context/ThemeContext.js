@@ -12,6 +12,9 @@ export const ThemeProvider = ({ children }) => {
     });
 
     useEffect(() => {
+        document.body.classList.remove("light", "dark");
+        document.body.classList.add(theme);    
+
         // Save theme to localStorage whenever it changes
         localStorage.setItem("theme", theme);
     }, [theme]);
