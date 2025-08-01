@@ -1,13 +1,15 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import useAppStateContext from '../hooks/useAppStateContext';
-import { useTheme } from '../context/ThemeContext';
-import './Sidebar.css';
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import useAppStateContext from "../hooks/useAppStateContext";
+import { useTheme } from "../context/ThemeContext";
+import "./Sidebar.css";
 
 const Sidebar = () => {
   const navigate = useNavigate();
   const { appState, dispatch } = useAppStateContext();
   const { theme, toggleTheme } = useTheme();
+
+  const firstAlphabet = appState.user?.email?.charAt(0);
 
   const handleLogout = () => {
     dispatch({ type: "Logout" });
@@ -20,7 +22,7 @@ const Sidebar = () => {
         <div className="logo-container">
           <img src="/assets/x-logo.png" alt="X" className="sidebar-logo" />
         </div>
-        
+
         <div className="nav-item active">
           <i className="fas fa-home"></i>
           <span>Home</span>
@@ -50,20 +52,24 @@ const Sidebar = () => {
           <span>More</span>
         </div>
         <div className="nav-item" onClick={toggleTheme}>
-          <i className={`fas ${theme === 'dark' ? 'fa-sun' : 'fa-moon'}`}></i>
-          <span>{theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
+          <i className={`fas ${theme === "dark" ? "fa-sun" : "fa-moon"}`}></i>
+          <span>{theme === "dark" ? "Light Mode" : "Dark Mode"}</span>
         </div>
-        
+
         <button className="post-button">Post</button>
-        
+
         <div className="user-profile">
           <div className="user-info">
-            <div className="user-avatar">
-              <img src="https://via.placeholder.com/40" alt="User avatar" />
+            <div className="compose-avatar">
+              <div className="avatar-placeholder">{firstAlphabet}</div>
             </div>
             <div className="user-details">
-              <div className="user-name">{appState?.user?.username || 'User'}</div>
-              <div className="user-email">{appState?.user?.email || 'user@example.com'}</div>
+              <div className="user-name">
+                {appState?.user?.username || "User"}
+              </div>
+              <div className="user-email">
+                {appState?.user?.email || "user@example.com"}
+              </div>
             </div>
           </div>
           <button className="logout-button" onClick={handleLogout}>
