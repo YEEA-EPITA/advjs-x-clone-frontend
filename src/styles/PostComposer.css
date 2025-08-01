@@ -270,3 +270,16 @@
   border: 1px solid #ccc;
   border-radius: 6px;
 }
+
+.error-text {
+  font-size: 12px;
+  color: #e36e63; .error-text {
+  font-size: 12px;
+  color: #e36e63;
+  margin-top: 4px;
+  margin-left: 4px;
+}
+
+  margin-top: 4px;
+  margin-left: 4px;
+}

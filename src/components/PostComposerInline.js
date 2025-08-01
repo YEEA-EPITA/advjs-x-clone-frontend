@@ -1,13 +1,25 @@
 import React, { useState, useRef } from 'react';
 import { useDispatch } from 'react-redux';
+import { useForm, useFieldArray } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
 import { createPost } from '../store/postSlice';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import LoaderBar from './LoaderBar';
 import {
   faGlobe, faImage, faChartBar,
   faSmile, faCalendar, faLocationDot
 } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import '../styles/PostComposer.css';
+
+const schema = yup.object().shape({
+  poll: yup.object().shape({
+    question: yup.string().max(255, 'Question must be less than 255 characters.'),
+    options: yup.array().of(
+      yup.string().max(255, 'Option must be less than 255 characters.')
+    )
+  })
+});
 
 const PostComposerInline = () => {
   const [content, setContent] = useState('');
@@ -19,9 +31,28 @@ const PostComposerInline = () => {
   const [isFetchingLocation, setIsFetchingLocation] = useState(false);
 
   const [showPoll, setShowPoll] = useState(false);
-  const [pollQuestion, setPollQuestion] = useState('');
-  const [pollOptions, setPollOptions] = useState(['', '']);
   const [pollDuration, setPollDuration] = useState({ days: 1, hours: 0, minutes: 0 });
+
+  const {
+    register,
+    handleSubmit,
+    control,
+    reset,
+    formState: { errors }
+  } = useForm({
+    defaultValues: {
+      poll: {
+        question: '',
+        options: ['', '']
+      }
+    },
+    resolver: yupResolver(schema)
+  });
+
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: 'poll.options'
+  });
 
   const dispatch = useDispatch();
   const fileInputRef = useRef(null);
@@ -68,7 +99,7 @@ const PostComposerInline = () => {
     );
   };
 
-  const handlePost = async () => {
+  const onSubmit = async (formData) => {
     if (!content.trim()) return;
 
     setIsPosting(true);
@@ -76,14 +107,14 @@ const PostComposerInline = () => {
     try {
       let pollPayload;
       if (showPoll) {
-        const options = pollOptions.filter(opt => opt.trim());
-        if (pollQuestion.trim() && options.length >= 2) {
+        const options = formData.poll.options.filter(opt => opt.trim());
+        if (formData.poll.question.trim() && options.length >= 2) {
           const expires = new Date();
           expires.setDate(expires.getDate() + Number(pollDuration.days || 0));
           expires.setHours(expires.getHours() + Number(pollDuration.hours || 0));
           expires.setMinutes(expires.getMinutes() + Number(pollDuration.minutes || 0));
           pollPayload = {
-            question: pollQuestion.trim(),
+            question: formData.poll.question.trim(),
             options,
             expires_at: expires.toISOString(),
           };
@@ -100,9 +131,8 @@ const PostComposerInline = () => {
       setContent('');
       setMediaFile(null);
       setLocationName('');
+      reset(); 
       setShowPoll(false);
-      setPollOptions(['', '']);
-      setPollQuestion('');
     } catch {}
     finally {
       setIsPosting(false);
@@ -136,124 +166,101 @@ const PostComposerInline = () => {
         />
 
         {showPoll && (
-          <div className="poll-section">
+          <form onSubmit={handleSubmit(onSubmit)} className="poll-section">
             <label className="poll-label">Ask a question</label>
             <input
               type="text"
               className="poll-input"
-              placeholder="e.g., What's your favorite framework?"
-              value={pollQuestion}
-              onChange={(e) => setPollQuestion(e.target.value)}
+              placeholder="e.g., What's your favorite book?"
+              {...register('poll.question')}
             />
-            {pollOptions.map((option, idx) => (
-              <div key={idx} className="poll-option-wrapper">
+            {errors.poll?.question && <p className="error-text">{errors.poll.question.message}</p>}
+
+            {fields.map((field, idx) => (
+              <div key={field.id} className="poll-option-wrapper">
                 <input
                   type="text"
                   placeholder={`Choice ${idx + 1}`}
-                  value={option}
-                  onChange={(e) => {
-                    const updated = [...pollOptions];
-                    updated[idx] = e.target.value;
-                    setPollOptions(updated);
-                  }}
+                  {...register(`poll.options.${idx}`)}
                   className="poll-input"
                 />
-                {pollOptions.length > 2 && (
+                {fields.length > 2 && (
                   <button
+                    type="button"
                     className="poll-delete-btn"
-                    onClick={() => {
-                      const updated = pollOptions.filter((_, i) => i !== idx);
-                      setPollOptions(updated);
-                    }}
+                    onClick={() => remove(idx)}
                   >
                     ✕
                   </button>
                 )}
+                {errors.poll?.options?.[idx] && <p className="error-text">{errors.poll.options[idx]?.message}</p>}
               </div>
             ))}
-            {pollOptions.length < 4 && (
-              <button className="poll-add-btn" onClick={() => setPollOptions([...pollOptions, ''])}>
+
+            {fields.length < 4 && (
+              <button type="button" className="poll-add-btn" onClick={() => append('')}>
                 + Add option
               </button>
             )}
+
             <div className="poll-duration">
               <label className="poll-label">Poll length</label>
               <div className="poll-duration-grid">
                 <div className="poll-duration-item">
                   <label>Days</label>
-                  <input
-                    type="number"
-                    min="0"
-                    value={pollDuration.days}
-                    onChange={(e) => setPollDuration({ ...pollDuration, days: e.target.value })}
-                  />
+                  <input type="number" min="0" value={pollDuration.days} onChange={(e) => setPollDuration({ ...pollDuration, days: e.target.value })} />
                 </div>
                 <div className="poll-duration-item">
                   <label>Hours</label>
-                  <input
-                    type="number"
-                    min="0"
-                    value={pollDuration.hours}
-                    onChange={(e) => setPollDuration({ ...pollDuration, hours: e.target.value })}
-                  />
+                  <input type="number" min="0" value={pollDuration.hours} onChange={(e) => setPollDuration({ ...pollDuration, hours: e.target.value })} />
                 </div>
                 <div className="poll-duration-item">
                   <label>Minutes</label>
-                  <input
-                    type="number"
-                    min="0"
-                    value={pollDuration.minutes}
-                    onChange={(e) => setPollDuration({ ...pollDuration, minutes: e.target.value })}
-                  />
+                  <input type="number" min="0" value={pollDuration.minutes} onChange={(e) => setPollDuration({ ...pollDuration, minutes: e.target.value })} />
                 </div>
               </div>
-              <button className="poll-remove-btn" onClick={() => {
+              <button type="button" className="poll-remove-btn" onClick={() => {
                 setShowPoll(false);
-                setPollOptions(['', '']);
-                setPollQuestion('');
+                reset();
               }}>
                 Remove poll
               </button>
             </div>
+
+            <button type="submit" className="submit-btn" disabled={isPosting || isFetchingLocation}>Post</button>
+          </form>
+        )}
+
+        {!showPoll && (
+          <div className="composer-footer">
+            <div className="icons">
+              <label htmlFor="image-upload" className="icon-label">
+                <FontAwesomeIcon icon={faImage} className="icon" />
+              </label>
+              <input
+                id="image-upload"
+                type="file"
+                accept="image/*"
+                ref={fileInputRef}
+                onChange={(e) => setMediaFile(e.target.files[0])}
+                style={{ display: 'none' }}
+              />
+              <FontAwesomeIcon icon={faChartBar} className="icon" onClick={() => setShowPoll(true)} />
+              <FontAwesomeIcon icon={faSmile} className="icon" />
+              <FontAwesomeIcon icon={faCalendar} className="icon" />
+              <FontAwesomeIcon icon={faLocationDot} className="icon" onClick={handleLocationClick} />
+            </div>
+            <button
+              className="submit-btn"
+              onClick={() => handleSubmit(onSubmit)()}
+              disabled={isPosting || isFetchingLocation}
+            >
+              Post
+            </button>
           </div>
         )}
 
-        <div className="reply-status">
-          <FontAwesomeIcon icon={faGlobe} />
-          {selectedAudience} can reply
-        </div>
-
-        {locationName && (
-          <div className="location-display">📍 {locationName}</div>
-        )}
-
-        <div className="composer-footer">
-          <div className="icons">
-            <label htmlFor="image-upload" className="icon-label">
-              <FontAwesomeIcon icon={faImage} className="icon" />
-            </label>
-            <input
-              id="image-upload"
-              type="file"
-              accept="image/*"
-              ref={fileInputRef}
-              onChange={(e) => setMediaFile(e.target.files[0])}
-              style={{ display: 'none' }}
-            />
-            <FontAwesomeIcon icon={faChartBar} className="icon" onClick={() => setShowPoll(!showPoll)} />
-            <FontAwesomeIcon icon={faSmile} className="icon" />
-            <FontAwesomeIcon icon={faCalendar} className="icon" />
-            <FontAwesomeIcon icon={faLocationDot} className="icon" onClick={handleLocationClick} />
-          </div>
-          <button
-            className="submit-btn"
-            onClick={handlePost}
-            disabled={isPosting || isFetchingLocation}
-          >
-            Post
-          </button>
-        </div>
-
+        {locationName && <div className="location-display">📍 {locationName}</div>}
         {isPosting && <LoaderBar />}
       </div>
     </div>

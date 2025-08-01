@@ -1,121 +1,121 @@
-import React, { useState, useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useForm, useFieldArray } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
 import '../styles/PostComposer.css';
-import { createPost } from '../store/postSlice'; 
+import { createPost } from '../store/postSlice';
 import LoaderBar from './LoaderBar';
-import { faTimes } from '@fortawesome/free-solid-svg-icons';
-import {
-  faGlobe,
-  faImage,
-  faChartBar,
-  faSmile,
-  faCalendar,
-  faLocationDot,
-} from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTimes, faGlobe, faImage, faChartBar, faSmile, faCalendar, faLocationDot } from '@fortawesome/free-solid-svg-icons';
+
+const schema = yup.object().shape({
+  poll: yup.object().shape({
+    question: yup.string().max(255, 'Question must be less than 255 characters.'),
+    options: yup.array().of(yup.string().max(255, 'Option must be less than 255 characters.')),
+  }),
+});
 
 const PostComposer = ({ onClose }) => {
-  const [content, setContent] = useState('');
-  const [mediaFile, setMediaFile] = useState(null);
-  const [showDropdown, setShowDropdown] = useState(false);
-  const [selectedAudience, setSelectedAudience] = useState('Everyone');
-  const [isPosting, setIsPosting] = useState(false);
-  const [location, setLocation] = useState(null);
-  const [locationName, setLocationName] = useState('');
-  const [isFetchingLocation, setIsFetchingLocation] = useState(false);
-  const [showPoll, setShowPoll] = useState(false);
-  const [pollQuestion, setPollQuestion] = useState('');
-  const [pollOptions, setPollOptions] = useState(['', '']);
-  const [pollDuration, setPollDuration] = useState({ days: 1, hours: 0, minutes: 0 });
-
-  const audienceOptions = ['Everyone', 'Followers', 'Only Me'];
-  const fileInputRef = useRef(null);
   const dispatch = useDispatch();
+  const fileInputRef = useRef(null);
+  const audienceOptions = ['Everyone', 'Followers', 'Only Me'];
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    control,
+    formState: { errors, isSubmitting },
+  } = useForm({
+    resolver: yupResolver(schema),
+    defaultValues: {
+      content: '',
+      poll: {
+        question: '',
+        options: ['', ''],
+        duration: { days: 1, hours: 0, minutes: 0 },
+      },
+    },
+  });
+
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: 'poll.options',
+  });
+
+  const watchPoll = watch('poll');
+  const showPoll = !!watchPoll;
+  const watchOptions = watch('poll.options');
+  const content = watch('content');
 
   const userString = localStorage.getItem('user');
   const user = userString ? JSON.parse(userString) : null;
   const userEmail = user?.email || '';
   const userInitial = userEmail.charAt(0).toUpperCase();
 
-  const handleSelect = (option) => {
-    setSelectedAudience(option);
-    setShowDropdown(false);
-  };
+  const [selectedAudience, setSelectedAudience] = React.useState('Everyone');
+  const [showDropdown, setShowDropdown] = React.useState(false);
+  const [mediaFile, setMediaFile] = React.useState(null);
+  const [locationName, setLocationName] = React.useState('');
+  const [isFetchingLocation, setIsFetchingLocation] = React.useState(false);
 
   const handleLocationClick = () => {
-    if (!navigator.geolocation) {
-      alert('Geolocation is not supported by your browser.');
-      return;
-    }
+    if (!navigator.geolocation) return alert('Geolocation not supported');
+
     setIsFetchingLocation(true);
 
     navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        const { latitude, longitude } = position.coords;
+      async ({ coords }) => {
         try {
-          const res = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`,
-            { headers: { 'Accept-Language': 'en' } }
-          );
+          const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${coords.latitude}&lon=${coords.longitude}&format=json`, {
+            headers: { 'Accept-Language': 'en' },
+          });
           const data = await res.json();
           const city = data.address.city || data.address.town || data.address.village || data.address.state;
-          setLocation(`${latitude},${longitude}`);
-          setLocationName(city || 'Unknown location');
-        } catch (error) {
+          setLocationName(city || 'Unknown');
+        } catch {
           setLocationName('Unknown');
         } finally {
           setIsFetchingLocation(false);
         }
       },
       () => {
-        alert('Failed to get your location');
+        alert('Could not retrieve location');
         setIsFetchingLocation(false);
       }
     );
   };
 
-  const handlePost = async () => {
-    if (!content.trim()) return alert("What’s happening?");
-    setIsPosting(true);
+  const onSubmit = async (data) => {
+    const { content, poll } = data;
+
+    let pollPayload;
+    if (poll?.question && poll?.options?.filter((opt) => opt.trim()).length >= 2) {
+      const expires = new Date();
+      expires.setDate(expires.getDate() + Number(poll.duration.days || 0));
+      expires.setHours(expires.getHours() + Number(poll.duration.hours || 0));
+      expires.setMinutes(expires.getMinutes() + Number(poll.duration.minutes || 0));
+
+      pollPayload = {
+        question: poll.question.trim(),
+        options: poll.options.filter((opt) => opt.trim()),
+        expires_at: expires.toISOString(),
+      };
+    }
 
     try {
-      let pollPayload;
-      if (showPoll) {
-        const options = pollOptions.filter(opt => opt.trim());
-        if (pollQuestion.trim() && options.length >= 2) {
-          const expires = new Date();
-          expires.setDate(expires.getDate() + Number(pollDuration.days || 0));
-          expires.setHours(expires.getHours() + Number(pollDuration.hours || 0));
-          expires.setMinutes(expires.getMinutes() + Number(pollDuration.minutes || 0));
-          pollPayload = {
-            question: pollQuestion.trim(),
-            options,
-            expires_at: expires.toISOString(),
-          };
-        }
-      }
+      await dispatch(createPost({
+        content,
+        mediaFile,
+        location: locationName || 'Unknown',
+        poll: pollPayload,
+      }));
 
-      await dispatch(
-        createPost({
-          content,
-          mediaFile,
-          location: locationName || 'Unknown',
-          poll: pollPayload,
-        })
-      );
-
-      setContent('');
-      setMediaFile(null);
-      setLocation(null);
-      setLocationName('');
-      setPollOptions(['', '']);
-      setPollQuestion('');
-      setShowPoll(false);
       onClose?.();
     } catch (err) {
-      console.error('Post failed:', err);
-    } finally {
-      setIsPosting(false);
+      console.error(err);
     }
   };
 
@@ -126,152 +126,124 @@ const PostComposer = ({ onClose }) => {
         <div className="draft-link">Drafts</div>
 
         <div className="profile-row">
-          <div className="profile-placeholder">{userInitial || 'U'}</div>
+          <div className="profile-placeholder">{userInitial}</div>
           <div className="audience-wrapper">
             <button className="audience-toggle" onClick={() => setShowDropdown(!showDropdown)}>
               {selectedAudience} ▼
             </button>
             {showDropdown && (
               <ul className="audience-dropdown">
-                {audienceOptions.map(option => (
-                  <li key={option} onClick={() => handleSelect(option)}>{option}</li>
+                {audienceOptions.map((opt) => (
+                  <li key={opt} onClick={() => { setSelectedAudience(opt); setShowDropdown(false); }}>{opt}</li>
                 ))}
               </ul>
             )}
           </div>
         </div>
 
-        <textarea
-          className="composer-textarea"
-          placeholder="What’s happening?"
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-        />
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <textarea
+            className="composer-textarea"
+            placeholder="What’s happening?"
+            {...register('content')}
+          />
+          {errors.content && <p className="error-text">{errors.content.message}</p>}
 
-        {locationName && <div className="location-display">📍 {locationName}</div>}
+          {locationName && <div className="location-display">📍 {locationName}</div>}
 
-        {showPoll && (
-          <div className="poll-section">
-            <label className="poll-label">Ask a question</label>
-            <input
-              type="text"
-              className="poll-input"
-              placeholder="e.g., What's your favorite framework?"
-              value={pollQuestion}
-              onChange={(e) => setPollQuestion(e.target.value)}
-            />
-            
-            {pollOptions.map((option, idx) => (
-              <div key={idx} className="poll-option-row">
-                <input
-                  type="text"
-                  placeholder={`Choice ${idx + 1}`}
-                  value={option}
-                  className="poll-input"
-                  onChange={(e) => {
-                    const updated = [...pollOptions];
-                    updated[idx] = e.target.value;
-                    setPollOptions(updated);
-                  }}
-                />
-                {pollOptions.length > 2 && (
-                  <button
-                    type="button"
-                    className="poll-delete-btn"
-                    onClick={() => {
-                      const updated = [...pollOptions];
-                      updated.splice(idx, 1);
-                      setPollOptions(updated);
-                    }}
-                  >
-                    <FontAwesomeIcon icon={faTimes} />
-                  </button>
-                )}
+          {showPoll && (
+            <div className="poll-section">
+              <label className="poll-label">Ask a question</label>
+              <input
+                type="text"
+                className="poll-input"
+                placeholder="e.g., What's your favorite book?"
+                {...register('poll.question')}
+              />
+              {errors.poll?.question && <p className="error-text">{errors.poll.question.message}</p>}
+
+              {fields.map((field, index) => (
+                <div key={field.id} className="poll-option-row">
+                  <input
+                    type="text"
+                    placeholder={`Choice ${index + 1}`}
+                    className="poll-input"
+                    {...register(`poll.options.${index}`)}
+                  />
+                  {watchOptions.length > 2 && (
+                    <button type="button" className="poll-delete-btn" onClick={() => remove(index)}>
+                      <FontAwesomeIcon icon={faTimes} />
+                    </button>
+                  )}
+                  {errors.poll?.options?.[index] && (
+                    <p className="error-text">{errors.poll.options[index].message}</p>
+                  )}
+                </div>
+              ))}
+
+              {watchOptions.length < 4 && (
+                <button type="button" className="poll-add-btn" onClick={() => append('')}>
+                  + Add option
+                </button>
+              )}
+
+              <div className="poll-duration">
+                <label className="poll-label">Poll length</label>
+                <div className="poll-duration-grid">
+                  {['days', 'hours', 'minutes'].map((unit) => (
+                    <div key={unit} className="poll-duration-item">
+                      <label>{unit.charAt(0).toUpperCase() + unit.slice(1)}</label>
+                      <input
+                        type="number"
+                        min="0"
+                        {...register(`poll.duration.${unit}`)}
+                      />
+                    </div>
+                  ))}
+                </div>
               </div>
-            ))}
 
-            {pollOptions.length < 4 && (
               <button
-                className="poll-add-btn"
-                onClick={() => setPollOptions([...pollOptions, ''])}
+                type="button"
+                className="poll-remove-btn"
+                onClick={() => {
+                  setValue('poll.question', '');
+                  setValue('poll.options', ['', '']);
+                }}
               >
-                + Add option
+                Remove poll
               </button>
-            )}
-
-            <div className="poll-duration">
-              <label className="poll-label">Poll length</label>
-              <div className="poll-duration-grid">
-                <div className="poll-duration-item">
-                  <label>Days</label>
-                  <input
-                    type="number"
-                    min="0"
-                    value={pollDuration.days}
-                    onChange={(e) => setPollDuration({ ...pollDuration, days: e.target.value })}
-                  />
-                </div>
-                <div className="poll-duration-item">
-                  <label>Hours</label>
-                  <input
-                    type="number"
-                    min="0"
-                    value={pollDuration.hours}
-                    onChange={(e) => setPollDuration({ ...pollDuration, hours: e.target.value })}
-                  />
-                </div>
-                <div className="poll-duration-item">
-                  <label>Minutes</label>
-                  <input
-                    type="number"
-                    min="0"
-                    value={pollDuration.minutes}
-                    onChange={(e) => setPollDuration({ ...pollDuration, minutes: e.target.value })}
-                  />
-                </div>
-              </div>
             </div>
+          )}
 
+          <div className="reply-status">
+            <FontAwesomeIcon icon={faGlobe} />
+            {selectedAudience} can reply
+          </div>
 
-            <button
-              className="poll-remove-btn"
-              onClick={() => {
-                setShowPoll(false);
-                setPollOptions(['', '']);
-                setPollQuestion('');
-              }}
-            >
-              Remove poll
+          <div className="composer-footer">
+            <div className="icons">
+              <div className="icon-label" onClick={() => fileInputRef.current?.click()} style={{ cursor: 'pointer' }}>
+                <FontAwesomeIcon icon={faImage} className="icon" />
+              </div>
+              <input
+                type="file"
+                accept="image/*"
+                ref={fileInputRef}
+                onChange={(e) => setMediaFile(e.target.files[0])}
+                style={{ display: 'none' }}
+              />
+              <FontAwesomeIcon icon={faChartBar} className="icon" onClick={() => setValue('poll.question', '')} />
+              <FontAwesomeIcon icon={faSmile} className="icon" />
+              <FontAwesomeIcon icon={faCalendar} className="icon" />
+              <FontAwesomeIcon icon={faLocationDot} className="icon" onClick={handleLocationClick} />
+            </div>
+            <button className="submit-btn" type="submit" disabled={isSubmitting || isFetchingLocation}>
+              Post
             </button>
           </div>
-        )}
-
-        <div className="reply-status">
-          <FontAwesomeIcon icon={faGlobe} />
-          {selectedAudience} can reply
-        </div>
-
-        <div className="composer-footer">
-          <div className="icons">
-            <div className="icon-label" onClick={() => fileInputRef.current?.click()} style={{ cursor: 'pointer' }}>
-              <FontAwesomeIcon icon={faImage} className="icon" />
-            </div>
-            <input
-              type="file"
-              accept="image/*"
-              ref={fileInputRef}
-              onChange={(e) => setMediaFile(e.target.files[0])}
-              style={{ display: 'none' }}
-            />
-            <FontAwesomeIcon icon={faChartBar} className="icon" onClick={() => setShowPoll(!showPoll)} />
-            <FontAwesomeIcon icon={faSmile} className="icon" />
-            <FontAwesomeIcon icon={faCalendar} className="icon" />
-            <FontAwesomeIcon icon={faLocationDot} className="icon" onClick={handleLocationClick} />
-          </div>
-          <button className="submit-btn" onClick={handlePost} disabled={isPosting || isFetchingLocation}>Post</button>
-        </div>
-
-        {isPosting && <LoaderBar />}
+          {isSubmitting && <LoaderBar />}
+        </form>
       </div>
     </div>
   );
