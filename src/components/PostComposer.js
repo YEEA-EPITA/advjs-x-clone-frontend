@@ -26,6 +26,12 @@ const PostComposer = ({ onClose }) => {
   const fileInputRef = useRef(null);
   const dispatch = useDispatch();
 
+  const userString = localStorage.getItem('user');
+  const user = userString ? JSON.parse(userString) : null;
+  const userEmail = user?.email || '';
+  const userInitial = userEmail.charAt(0).toUpperCase();
+
+
   const handleSelect = (option) => {
     setSelectedAudience(option);
     setShowDropdown(false);
@@ -105,7 +111,7 @@ const PostComposer = ({ onClose }) => {
       <div className="draft-link">Drafts</div>
 
       <div className="profile-row">
-        <div className="profile-placeholder">YW</div>
+        <div className="profile-placeholder">{userInitial || 'U'}</div>
         <div className="audience-wrapper">
           <button
             className="audience-toggle"
