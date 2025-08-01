@@ -6,10 +6,10 @@ const PublicRoute = () => {
 
     const { appState } = useAppStateContext()
 
-    return !appState?.isAutenticated && !appState?.user ? (
+    return !appState?.isAuthenticated && !appState?.user ? (
         <Outlet />
     ) : (
-        <Navigate to="/login" />
+        <Navigate to="/home" />
     )
 }
 

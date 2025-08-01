@@ -37,17 +37,27 @@ const LoginForm = () => {
   const onSubmit = async ({ email, password }) => {
     try {
       const res = await xcloneApi.post(userRequests.login, { email, password });
+      
+      console.log('Login response:', res.data); // Debug log
+      
+      // Store the complete user data with token
+      const userData = {
+        token: res.data.token || res.data.body?.token, // Handle different response structures
+        email,
+        username: res.data.username || res.data.body?.username,
+        userId: res.data.userId || res.data.body?.userId,
+        isAuthenticated: true
+      };
+      
+      // Store in localStorage directly
+      localStorage.setItem("user", JSON.stringify(userData));
 
       const token = res.data.body.token;
       const username = res.data.body.user.username;
 
       dispatch({
         type: "Login",
-        payload: {
-          token: res.data.token,
-          email,
-          username: res.data.username,
-        },
+        payload: userData,
       });
 
       localStorage.setItem('token', token);
