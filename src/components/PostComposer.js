@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -21,6 +21,8 @@ const PostComposer = ({ onClose }) => {
   const fileInputRef = useRef(null);
   const audienceOptions = ['Everyone', 'Followers', 'Only Me'];
 
+  const [showPoll, setShowPoll] = useState(false);
+
   const {
     register,
     handleSubmit,
@@ -32,11 +34,6 @@ const PostComposer = ({ onClose }) => {
     resolver: yupResolver(schema),
     defaultValues: {
       content: '',
-      poll: {
-        question: '',
-        options: ['', ''],
-        duration: { days: 1, hours: 0, minutes: 0 },
-      },
     },
   });
 
@@ -45,8 +42,15 @@ const PostComposer = ({ onClose }) => {
     name: 'poll.options',
   });
 
+   useEffect(() => {
+    if (showPoll) {
+      setValue('poll.question', '');
+      setValue('poll.options', ['', '']);
+      setValue('poll.duration', { days: 1, hours: 0, minutes: 0 });
+    }
+  }, [showPoll, setValue]);
+
   const watchPoll = watch('poll');
-  const showPoll = !!watchPoll;
   const watchOptions = watch('poll.options');
   const content = watch('content');
 
@@ -92,7 +96,7 @@ const PostComposer = ({ onClose }) => {
     const { content, poll } = data;
 
     let pollPayload;
-    if (poll?.question && poll?.options?.filter((opt) => opt.trim()).length >= 2) {
+    if (showPoll && poll?.question && poll?.options?.filter((opt) => opt.trim()).length >= 2) {
       const expires = new Date();
       expires.setDate(expires.getDate() + Number(poll.duration.days || 0));
       expires.setHours(expires.getHours() + Number(poll.duration.hours || 0));
@@ -207,6 +211,7 @@ const PostComposer = ({ onClose }) => {
                 type="button"
                 className="poll-remove-btn"
                 onClick={() => {
+                  setShowPoll(false);
                   setValue('poll.question', '');
                   setValue('poll.options', ['', '']);
                 }}
@@ -233,7 +238,12 @@ const PostComposer = ({ onClose }) => {
                 onChange={(e) => setMediaFile(e.target.files[0])}
                 style={{ display: 'none' }}
               />
-              <FontAwesomeIcon icon={faChartBar} className="icon" onClick={() => setValue('poll.question', '')} />
+              <FontAwesomeIcon
+                icon={faChartBar}
+                className="icon"
+                onClick={() => setShowPoll(prev => !prev)}
+              />
+              
               <FontAwesomeIcon icon={faSmile} className="icon" />
               <FontAwesomeIcon icon={faCalendar} className="icon" />
               <FontAwesomeIcon icon={faLocationDot} className="icon" onClick={handleLocationClick} />
