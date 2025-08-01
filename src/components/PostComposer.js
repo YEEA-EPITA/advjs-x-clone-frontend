@@ -19,6 +19,9 @@ const PostComposer = ({ onClose }) => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [selectedAudience, setSelectedAudience] = useState('Everyone');
   const [isPosting, setIsPosting] = useState(false);
+  const [location, setLocation] = useState(null);
+  const [locationName, setLocationName] = useState('');
+  const [isFetchingLocation, setIsFetchingLocation] = useState(false);
   const audienceOptions = ['Everyone', 'Followers', 'Only Me'];
   const fileInputRef = useRef(null);
   const dispatch = useDispatch();
@@ -28,27 +31,73 @@ const PostComposer = ({ onClose }) => {
     setShowDropdown(false);
   };
 
-  const handlePost = async () => {
+  const handleLocationClick = () => {
+    if (!navigator.geolocation) {
+      alert('Geolocation is not supported by your browser.');
+      return;
+    }
+
+    setIsFetchingLocation(true);
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+
+        try {
+          const res = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`,
+            {
+              headers: {
+                'Accept-Language': 'en' 
+              }
+            }
+          );  
+
+          const data = await res.json();
+
+          const city =
+            data.address.city || data.address.town || data.address.village || data.address.state;
+          
+          setLocation(`${latitude},${longitude}`); 
+          setLocationName(city || 'Unknown location');
+        } catch (error) {
+          console.error('Error fetching city name:', error);
+          setLocationName('Unknown');
+        } finally {
+          setIsFetchingLocation(false);
+        }
+      },
+      (error) => {
+        alert('Failed to get your location');
+        console.error(error);
+        setIsFetchingLocation(false);
+      }
+    );
+  };
+  
+   const handlePost = async () => {
     if (!content.trim()) return alert("What’s happening?");
     setIsPosting(true);
 
-    const formData = new FormData();
-    formData.append('content', content);
-    if (mediaFile) formData.append('media', mediaFile);
-    formData.append('location', 'Paris');
-
     try {
-      await dispatch(createPost({ content, mediaFile, location: 'Paris' }));
+      await dispatch(
+        createPost({
+          content,
+          mediaFile,
+          location: locationName || 'Unknown',
+        })
+      );
       setContent('');
       setMediaFile(null);
+      setLocation(null);
+      setLocationName('');
       onClose?.();
     } catch (err) {
       console.error('Post failed', err);
     } finally {
       setIsPosting(false);
     }
-};
-
+  };
 
   return (
     <div className="composer-modal">
@@ -84,6 +133,12 @@ const PostComposer = ({ onClose }) => {
         onChange={(e) => setContent(e.target.value)}
       />
 
+      {locationName && (
+        <div className="location-display">
+          📍 {locationName}
+        </div>
+      )}
+
       <div className="reply-status">
         <FontAwesomeIcon icon={faGlobe} />
         {selectedAudience} can reply
@@ -108,7 +163,7 @@ const PostComposer = ({ onClose }) => {
           <FontAwesomeIcon icon={faChartBar} className="icon" />
           <FontAwesomeIcon icon={faSmile} className="icon" />
           <FontAwesomeIcon icon={faCalendar} className="icon" />
-          <FontAwesomeIcon icon={faLocationDot} className="icon" />
+          <FontAwesomeIcon icon={faLocationDot} className="icon" onClick={handleLocationClick} />
         </div>
         <button className="submit-btn" onClick={handlePost}>Post</button>
       </div>

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import PostComposer from '../components/PostComposer';
-import '../styles/HomePage.css';
+import '../styles/HomeTestPage.css';
 
 const HomePage = () => {
   const [showComposer, setShowComposer] = useState(false);
