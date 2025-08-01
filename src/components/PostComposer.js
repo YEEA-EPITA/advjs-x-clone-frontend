@@ -91,12 +91,8 @@ const PostComposer = ({ onClose }) => {
 
       <div className="composer-footer">
         <div className="icons">
-      
-          <label
-            htmlFor="image-upload"
-            className="icon-label"
-            onClick={() => fileInputRef.current?.click()}
-          >
+
+          <label htmlFor="image-upload" className="icon-label">
             <FontAwesomeIcon icon={faImage} className="icon" />
           </label>
 
