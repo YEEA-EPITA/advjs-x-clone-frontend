@@ -18,18 +18,19 @@ const PostComposerInline = () => {
   const [isPosting, setIsPosting] = useState(false);
   const [isFetchingLocation, setIsFetchingLocation] = useState(false);
 
+  const [showPoll, setShowPoll] = useState(false);
+  const [pollQuestion, setPollQuestion] = useState('');
+  const [pollOptions, setPollOptions] = useState(['', '']);
+  const [pollDuration, setPollDuration] = useState({ days: 1, hours: 0, minutes: 0 });
+
   const dispatch = useDispatch();
   const fileInputRef = useRef(null);
   const audienceOptions = ['Everyone', 'Followers', 'Only Me'];
 
-  // const user = JSON.parse(localStorage.getItem('user'));
-  // const userName = user?.name || '';
-  // const userInitial = userName.charAt(0).toUpperCase();
   const userString = localStorage.getItem('user');
   const user = userString ? JSON.parse(userString) : null;
   const userEmail = user?.email || '';
   const userInitial = userEmail.charAt(0).toUpperCase();
-
 
   const handleSelectAudience = (option) => {
     setSelectedAudience(option);
@@ -43,7 +44,6 @@ const PostComposerInline = () => {
     }
 
     setIsFetchingLocation(true);
-
     navigator.geolocation.getCurrentPosition(
       async ({ coords }) => {
         const { latitude, longitude } = coords;
@@ -55,14 +55,14 @@ const PostComposerInline = () => {
           const data = await res.json();
           const city = data.address.city || data.address.town || data.address.village || data.address.state;
           setLocationName(city || 'Unknown location');
-        } catch (err) {
+        } catch {
           setLocationName('Unknown');
         } finally {
           setIsFetchingLocation(false);
         }
       },
-      (err) => {
-        console.error('Location error', err);
+      () => {
+        console.error('Location error');
         setIsFetchingLocation(false);
       }
     );
@@ -72,18 +72,39 @@ const PostComposerInline = () => {
     if (!content.trim()) return;
 
     setIsPosting(true);
+
     try {
+      let pollPayload;
+      if (showPoll) {
+        const options = pollOptions.filter(opt => opt.trim());
+        if (pollQuestion.trim() && options.length >= 2) {
+          const expires = new Date();
+          expires.setDate(expires.getDate() + Number(pollDuration.days || 0));
+          expires.setHours(expires.getHours() + Number(pollDuration.hours || 0));
+          expires.setMinutes(expires.getMinutes() + Number(pollDuration.minutes || 0));
+          pollPayload = {
+            question: pollQuestion.trim(),
+            options,
+            expires_at: expires.toISOString(),
+          };
+        }
+      }
+
       await dispatch(createPost({
         content,
         mediaFile,
-        location: locationName || 'Unknown'
+        location: locationName || 'Unknown',
+        poll: pollPayload
       }));
+
       setContent('');
       setMediaFile(null);
       setLocationName('');
-    } catch (err) {
-      console.error('Post failed', err);
-    } finally {
+      setShowPoll(false);
+      setPollOptions(['', '']);
+      setPollQuestion('');
+    } catch {}
+    finally {
       setIsPosting(false);
     }
   };
@@ -93,15 +114,12 @@ const PostComposerInline = () => {
       <div className="profile-placeholder">{userInitial || 'U'}</div>
       <div className="composer-body">
         <div className="audience-wrapper">
-          <button
-            className="audience-toggle"
-            onClick={() => setShowDropdown(!showDropdown)}
-          >
+          <button className="audience-toggle" onClick={() => setShowDropdown(!showDropdown)}>
             {selectedAudience} ▼
           </button>
           {showDropdown && (
             <ul className="audience-dropdown">
-              {audienceOptions.map((option) => (
+              {audienceOptions.map(option => (
                 <li key={option} onClick={() => handleSelectAudience(option)}>
                   {option}
                 </li>
@@ -116,6 +134,89 @@ const PostComposerInline = () => {
           value={content}
           onChange={(e) => setContent(e.target.value)}
         />
+
+        {showPoll && (
+          <div className="poll-section">
+            <label className="poll-label">Ask a question</label>
+            <input
+              type="text"
+              className="poll-input"
+              placeholder="e.g., What's your favorite framework?"
+              value={pollQuestion}
+              onChange={(e) => setPollQuestion(e.target.value)}
+            />
+            {pollOptions.map((option, idx) => (
+              <div key={idx} className="poll-option-wrapper">
+                <input
+                  type="text"
+                  placeholder={`Choice ${idx + 1}`}
+                  value={option}
+                  onChange={(e) => {
+                    const updated = [...pollOptions];
+                    updated[idx] = e.target.value;
+                    setPollOptions(updated);
+                  }}
+                  className="poll-input"
+                />
+                {pollOptions.length > 2 && (
+                  <button
+                    className="poll-delete-btn"
+                    onClick={() => {
+                      const updated = pollOptions.filter((_, i) => i !== idx);
+                      setPollOptions(updated);
+                    }}
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
+            ))}
+            {pollOptions.length < 4 && (
+              <button className="poll-add-btn" onClick={() => setPollOptions([...pollOptions, ''])}>
+                + Add option
+              </button>
+            )}
+            <div className="poll-duration">
+              <label className="poll-label">Poll length</label>
+              <div className="poll-duration-grid">
+                <div className="poll-duration-item">
+                  <label>Days</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={pollDuration.days}
+                    onChange={(e) => setPollDuration({ ...pollDuration, days: e.target.value })}
+                  />
+                </div>
+                <div className="poll-duration-item">
+                  <label>Hours</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={pollDuration.hours}
+                    onChange={(e) => setPollDuration({ ...pollDuration, hours: e.target.value })}
+                  />
+                </div>
+                <div className="poll-duration-item">
+                  <label>Minutes</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={pollDuration.minutes}
+                    onChange={(e) => setPollDuration({ ...pollDuration, minutes: e.target.value })}
+                  />
+                </div>
+              </div>
+              <button className="poll-remove-btn" onClick={() => {
+                setShowPoll(false);
+                setPollOptions(['', '']);
+                setPollQuestion('');
+              }}>
+                Remove poll
+              </button>
+            </div>
+          </div>
+        )}
 
         <div className="reply-status">
           <FontAwesomeIcon icon={faGlobe} />
@@ -139,7 +240,7 @@ const PostComposerInline = () => {
               onChange={(e) => setMediaFile(e.target.files[0])}
               style={{ display: 'none' }}
             />
-            <FontAwesomeIcon icon={faChartBar} className="icon" />
+            <FontAwesomeIcon icon={faChartBar} className="icon" onClick={() => setShowPoll(!showPoll)} />
             <FontAwesomeIcon icon={faSmile} className="icon" />
             <FontAwesomeIcon icon={faCalendar} className="icon" />
             <FontAwesomeIcon icon={faLocationDot} className="icon" onClick={handleLocationClick} />
