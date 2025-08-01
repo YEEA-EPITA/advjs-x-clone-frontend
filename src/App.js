@@ -1,6 +1,5 @@
 import { Route, Routes } from "react-router-dom";
 
-import HomeTestPage from "./pages/HomeTestPage";
 import HomePage from "./pages/HomePage";
 import NotFoundPage from "./pages/NotFoundPage";
 
@@ -23,7 +22,6 @@ const App = () => {
         {/* Private Routes */}
         <Route element={<PrivateRoute />}>
           <Route path="/home" element={<HomePage />} />
-          <Route path="/home/test" element={<HomeTestPage />} />
           <Route path="/compose/post" element={<ComposePostPage />} />
         </Route>
 

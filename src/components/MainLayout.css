@@ -3,8 +3,8 @@
 /* CSS Variables for Theme Support */
 .main-layout {
   /* Dark Theme (Default) */
-  --bg-primary: #000;
-  --bg-secondary: #16181c;
+  --bg-primary: #1c1c1c;
+  --bg-secondary: #262629;
   --bg-hover: #181818;
   --bg-hover-light: rgba(255, 255, 255, 0.03);
   --border-color: #2f3336;
