@@ -31,6 +31,20 @@
   border-radius: 50%;
 }
 
+.compose-avatar .avatar-placeholder {
+  width: 40px;
+  height: 40px;
+  background-color: #4a90e2; /* or any fallback color */
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 18px;
+  text-transform: uppercase;
+}
+
 .compose-content {
   flex: 1;
 }
@@ -261,7 +275,8 @@
   margin: 8px 0;
 }
 
-.hashtag, .mention {
+.hashtag,
+.mention {
   padding: 4px 8px;
   border-radius: 12px;
   font-size: 14px;
@@ -301,20 +316,20 @@
   .compose-post {
     padding: 12px 16px;
   }
-  
+
   .post {
     padding: 12px 16px;
   }
-  
+
   .poll-container {
     padding: 12px;
     margin: 8px 0;
   }
-  
+
   .poll-option {
     padding: 10px 12px;
   }
-  
+
   .post-tags {
     gap: 6px;
   }
