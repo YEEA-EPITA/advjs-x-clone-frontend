@@ -2,6 +2,8 @@ import { createContext, useReducer, useEffect, useRef } from "react";
 import AppStateReducer from "./AppStateReducer";
 import { io } from "socket.io-client";
 
+const serverUrl = process.env.REACT_APP_API_URL || "http://localhost:8080";
+
 const INITIAL_STATE = {
   isAuthenticated:
     typeof window !== "undefined" && localStorage.getItem("user")
@@ -22,7 +24,7 @@ export const AppStateProvider = ({ children }) => {
 
   useEffect(() => {
     // Connect socket after mount
-    socketRef.current = io("http://localhost:8080", {
+    socketRef.current = io(serverUrl, {
       withCredentials: true,
       transports: ["websocket"],
       auth: {

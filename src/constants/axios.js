@@ -1,8 +1,8 @@
 import axios from "axios";
 
 export const xcloneApi = axios.create({
-    baseURL: "http://localhost:8080",
-//     headers: {
-//     "Content-Type": "application/json"
-//   }
-})
+  baseURL: process.env.REACT_APP_API_URL || "http://localhost:8000",
+  //     headers: {
+  //     "Content-Type": "application/json"
+  //   }
+});
