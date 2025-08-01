@@ -22,6 +22,7 @@ const PostComposer = ({ onClose }) => {
   const [location, setLocation] = useState(null);
   const [locationName, setLocationName] = useState('');
   const [isFetchingLocation, setIsFetchingLocation] = useState(false);
+
   const audienceOptions = ['Everyone', 'Followers', 'Only Me'];
   const fileInputRef = useRef(null);
   const dispatch = useDispatch();
@@ -30,7 +31,6 @@ const PostComposer = ({ onClose }) => {
   const user = userString ? JSON.parse(userString) : null;
   const userEmail = user?.email || '';
   const userInitial = userEmail.charAt(0).toUpperCase();
-
 
   const handleSelect = (option) => {
     setSelectedAudience(option);
@@ -79,7 +79,7 @@ const PostComposer = ({ onClose }) => {
     );
   };
   
-   const handlePost = async () => {
+  const handlePost = async () => {
     if (!content.trim()) return alert("What’s happening?");
     setIsPosting(true);
 
@@ -97,6 +97,7 @@ const PostComposer = ({ onClose }) => {
       setLocationName('');
       onClose?.();
     } catch (err) {
+      console.error('Post failed:', err);
     } finally {
       setIsPosting(false);
     }
@@ -147,15 +148,20 @@ const PostComposer = ({ onClose }) => {
 
         <div className="composer-footer">
           <div className="icons">
-            <label htmlFor="image-upload" className="icon-label">
+            <div
+              className="icon-label"
+              onClick={() => fileInputRef.current?.click()}
+              style={{ cursor: 'pointer' }}
+            >
               <FontAwesomeIcon icon={faImage} className="icon" />
-            </label>
+            </div>
             <input
-              id="image-upload"
               type="file"
               accept="image/*"
               ref={fileInputRef}
-              onChange={(e) => setMediaFile(e.target.files[0])}
+              onChange={(e) => {
+                setMediaFile(e.target.files[0]);
+              }}
               style={{ display: 'none' }}
             />
             <FontAwesomeIcon icon={faChartBar} className="icon" />
@@ -163,15 +169,19 @@ const PostComposer = ({ onClose }) => {
             <FontAwesomeIcon icon={faCalendar} className="icon" />
             <FontAwesomeIcon icon={faLocationDot} className="icon" onClick={handleLocationClick} />
           </div>
-          <button className="submit-btn" onClick={handlePost}>Post</button>
+          <button
+            className="submit-btn"
+            onClick={handlePost}
+            disabled={isPosting || isFetchingLocation}
+          >
+            Post
+          </button>
         </div>
 
         {isPosting && <LoaderBar />}
       </div>
     </div>
   );
-
-
 };
 
 export default PostComposer;
