@@ -4,12 +4,14 @@ import { postRequests } from "../constants/requests";
 import MainLayout from "../components/MainLayout";
 import "./HomePage.css";
 import useAppStateContext from "../hooks/useAppStateContext";
+import PostComposer from "../components/PostComposer";
 
 const HomePage = () => {
   const [tweetText, setTweetText] = useState("");
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isComposerOpen, setIsComposerOpen] = useState(false); 
 
   const { appState } = useAppStateContext();
   const firstAlphabet = appState.user?.email?.charAt(0);
@@ -139,7 +141,9 @@ const HomePage = () => {
   };
 
   return (
-    <MainLayout>
+    <MainLayout onPostClick={() => {
+      setIsComposerOpen(true);
+    }}>
       <div className="feed-header">
         <h2>Home</h2>
       </div>
@@ -168,8 +172,9 @@ const HomePage = () => {
               <span className="character-count">{280 - tweetText.length}</span>
               <button
                 className="post-tweet-button"
-                onClick={handleTweet}
-                disabled={!tweetText.trim()}
+                onClick={() => {
+                  setIsComposerOpen(true);
+                }}
               >
                 Post
               </button>
@@ -289,6 +294,13 @@ const HomePage = () => {
           ))
         )}
       </div>
+      {isComposerOpen && (
+        <>
+          <div className="composer-backdrop" onClick={() => setIsComposerOpen(false)} />
+          <PostComposer onClose={() => setIsComposerOpen(false)} />
+        </>
+      )}
+
     </MainLayout>
   );
 };

@@ -106,76 +106,75 @@ const PostComposer = ({ onClose }) => {
   };
 
   return (
-    <div className="composer-modal">
-      <button className="close-btn" onClick={onClose}>✕</button>
-      <div className="draft-link">Drafts</div>
+    <div className="composer-overlay">
+      <div className="composer-modal">
+        <button className="close-btn" onClick={onClose}>✕</button>
+        <div className="draft-link">Drafts</div>
 
-      <div className="profile-row">
-        <div className="profile-placeholder">{userInitial || 'U'}</div>
-        <div className="audience-wrapper">
-          <button
-            className="audience-toggle"
-            onClick={() => setShowDropdown(!showDropdown)}
-          >
-            {selectedAudience} ▼
-          </button>
-
-          {showDropdown && (
-            <ul className="audience-dropdown">
-              {audienceOptions.map((option) => (
-                <li key={option} onClick={() => handleSelect(option)}>
-                  {option}
-                </li>
-              ))}
-            </ul>
-          )}
+        <div className="profile-row">
+          <div className="profile-placeholder">{userInitial || 'U'}</div>
+          <div className="audience-wrapper">
+            <button
+              className="audience-toggle"
+              onClick={() => setShowDropdown(!showDropdown)}
+            >
+              {selectedAudience} ▼
+            </button>
+            {showDropdown && (
+              <ul className="audience-dropdown">
+                {audienceOptions.map((option) => (
+                  <li key={option} onClick={() => handleSelect(option)}>
+                    {option}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
         </div>
-      </div>
 
-      <textarea
-        className="composer-textarea"
-        placeholder="What’s happening?"
-        value={content}
-        onChange={(e) => setContent(e.target.value)}
-      />
+        <textarea
+          className="composer-textarea"
+          placeholder="What’s happening?"
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+        />
 
-      {locationName && (
-        <div className="location-display">
-          📍 {locationName}
+        {locationName && (
+          <div className="location-display">📍 {locationName}</div>
+        )}
+
+        <div className="reply-status">
+          <FontAwesomeIcon icon={faGlobe} />
+          {selectedAudience} can reply
         </div>
-      )}
 
-      <div className="reply-status">
-        <FontAwesomeIcon icon={faGlobe} />
-        {selectedAudience} can reply
-      </div>
-
-      <div className="composer-footer">
-        <div className="icons">
-
-          <label htmlFor="image-upload" className="icon-label">
-            <FontAwesomeIcon icon={faImage} className="icon" />
-          </label>
-
-          <input
-            id="image-upload"
-            type="file"
-            accept="image/*"
-            ref={fileInputRef}
-            onChange={(e) => setMediaFile(e.target.files[0])}
-            style={{ display: 'none' }}
-          />
-
-          <FontAwesomeIcon icon={faChartBar} className="icon" />
-          <FontAwesomeIcon icon={faSmile} className="icon" />
-          <FontAwesomeIcon icon={faCalendar} className="icon" />
-          <FontAwesomeIcon icon={faLocationDot} className="icon" onClick={handleLocationClick} />
+        <div className="composer-footer">
+          <div className="icons">
+            <label htmlFor="image-upload" className="icon-label">
+              <FontAwesomeIcon icon={faImage} className="icon" />
+            </label>
+            <input
+              id="image-upload"
+              type="file"
+              accept="image/*"
+              ref={fileInputRef}
+              onChange={(e) => setMediaFile(e.target.files[0])}
+              style={{ display: 'none' }}
+            />
+            <FontAwesomeIcon icon={faChartBar} className="icon" />
+            <FontAwesomeIcon icon={faSmile} className="icon" />
+            <FontAwesomeIcon icon={faCalendar} className="icon" />
+            <FontAwesomeIcon icon={faLocationDot} className="icon" onClick={handleLocationClick} />
+          </div>
+          <button className="submit-btn" onClick={handlePost}>Post</button>
         </div>
-        <button className="submit-btn" onClick={handlePost}>Post</button>
+
+        {isPosting && <LoaderBar />}
       </div>
-      {isPosting && <LoaderBar />}
-    </div>    
+    </div>
   );
+
+
 };
 
 export default PostComposer;
