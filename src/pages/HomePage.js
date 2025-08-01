@@ -5,6 +5,7 @@ import MainLayout from "../components/MainLayout";
 import "./HomePage.css";
 import useAppStateContext from "../hooks/useAppStateContext";
 import PostComposer from "../components/PostComposer";
+import PostComposerInline from "../components/PostComposerInline";
 
 const HomePage = () => {
   const [tweetText, setTweetText] = useState("");
@@ -148,41 +149,10 @@ const HomePage = () => {
         <h2>Home</h2>
       </div>
 
-      <div className="compose-post">
-        <div className="compose-avatar">
-          <div className="avatar-placeholder">{firstAlphabet}</div>
-        </div>
-        <div className="compose-content">
-          <textarea
-            placeholder="What's happening?"
-            rows="3"
-            value={tweetText}
-            onChange={(e) => setTweetText(e.target.value)}
-            maxLength={280}
-          ></textarea>
-          <div className="compose-actions">
-            <div className="compose-icons">
-              <i className="fas fa-image"></i>
-              <i className="fas fa-poll"></i>
-              <i className="fas fa-smile"></i>
-              <i className="fas fa-calendar"></i>
-              <i className="fas fa-map-marker-alt"></i>
-            </div>
-            <div className="compose-right">
-              <span className="character-count">{280 - tweetText.length}</span>
-              <button
-                className="post-tweet-button"
-                onClick={() => {
-                  setIsComposerOpen(true);
-                }}
-              >
-                Post
-              </button>
-            </div>
-          </div>
-        </div>
+      <div>
+        <PostComposerInline />
       </div>
-
+    
       <div className="posts-container">
         {loading ? (
           <div className="post">
