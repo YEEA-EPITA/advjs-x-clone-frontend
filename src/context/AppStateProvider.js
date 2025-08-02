@@ -14,6 +14,7 @@ const INITIAL_STATE = {
       ? JSON.parse(localStorage.getItem("user"))
       : null,
   socket: null, // placeholder
+  postsList: [],
 };
 
 export const AppStateContext = createContext(INITIAL_STATE);
