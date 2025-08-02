@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import MainLayout from "../components/MainLayout";
 import "../styles/NotificationsPage.css";
+import emptyImage from "../assets/empty-verified.png";
 import {
   faAt,
   faHeart,
@@ -75,31 +76,46 @@ const NotificationsPage = () => {
           </div>
         </div>
 
+        {filtered.length === 0 ? (
+        <div className="notification-empty">
+            <img src={emptyImage} alt="No notifications" className="empty-image" />
+            <h2>Nothing to see here — yet</h2>
+            <p>
+            Likes, mentions, reposts, and a whole lot more — when it comes from a
+            verified account, you’ll find it here.{" "}
+            <a href="https://help.twitter.com/en/using-twitter/notifications-on-twitter" target="_blank" rel="noreferrer">
+                Learn more
+            </a>
+            </p>
+        </div>
+        ) : (
         <ul className="notification-list">
-          {filtered.map((n) => (
+            {filtered.map((n) => (
             <li key={n.id} className="notification-item">
-              <div className="notification-icon-avatar">
+                <div className="notification-icon-avatar">
                 <div className="notification-left-icon">
-                  <FontAwesomeIcon
+                    <FontAwesomeIcon
                     icon={typeIconMap[n.type] || faComment}
                     style={{ color: "#1DA1F2" }}
-                  />
+                    />
                 </div>
                 <div className="notification-avatar">
-                  <div className="avatar-placeholder">
+                    <div className="avatar-placeholder">
                     {n.user?.charAt(0)?.toUpperCase() || "?"}
-                  </div>
+                    </div>
                 </div>
-              </div>
-              <div className="notification-content">
+                </div>
+                <div className="notification-content">
                 <div className="notification-text">
-                  <strong>{n.user}</strong>: {n.message}
+                    <strong>{n.user}</strong>: {n.message}
                 </div>
                 <div className="notification-time">{n.time}</div>
-              </div>
+                </div>
             </li>
-          ))}
+            ))}
         </ul>
+        )}
+
       </div>
     </MainLayout>
   );
