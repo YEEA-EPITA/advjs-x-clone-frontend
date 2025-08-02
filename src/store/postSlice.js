@@ -2,26 +2,24 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { xcloneApi } from '../constants/axios';
 import { postRequests } from '../constants/requests';
 
-// Asynchronous thunk action
 export const createPost = createAsyncThunk(
   'posts/createPost',
-  async ({ content, mediaFile, location = 'Paris', poll }, thunkAPI) => {
+  async (payload, thunkAPI) => {
     try {
+      const { content, mediaFile, location = 'Paris', poll, hashtags, mentions } = payload;
+
       const formData = new FormData();
       formData.append('content', content);
-      if (mediaFile) {
-        formData.append('media', mediaFile);
-      }
+      if (mediaFile) formData.append('media', mediaFile);
       formData.append('location', location);
-
-      if (poll) {
-        formData.append('poll', JSON.stringify(poll)); 
-      }
+      if (poll) formData.append('poll', JSON.stringify(poll));
+      if (hashtags?.length) formData.append('hashtags', JSON.stringify(hashtags));
+      if (mentions?.length) formData.append('mentions', JSON.stringify(mentions));
 
       const res = await xcloneApi.post(postRequests.createPost, formData, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
-        }
+        },
       });
 
       return res.data.post;
@@ -34,7 +32,7 @@ export const createPost = createAsyncThunk(
 const postSlice = createSlice({
   name: 'posts',
   initialState: {
-    items: [],
+    posts: [],
     loading: false,
     error: null,
   },
@@ -47,7 +45,7 @@ const postSlice = createSlice({
       })
       .addCase(createPost.fulfilled, (state, action) => {
         state.loading = false;
-        state.items.unshift(action.payload);
+        state.posts.unshift(action.payload);
       })
       .addCase(createPost.rejected, (state, action) => {
         state.loading = false;
@@ -55,5 +53,6 @@ const postSlice = createSlice({
       });
   },
 });
+
 
 export default postSlice.reducer;

@@ -22,8 +22,7 @@ const Sidebar = ({ onPostClick }) => {
         <div className="logo-container">
           <img src="/assets/x-logo.png" alt="X" className="sidebar-logo" />
         </div>
-
-        <div className="nav-item active">
+        <div className="nav-item active" onClick={() => navigate("/home")}>
           <i className="fas fa-home"></i>
           <span>Home</span>
         </div>
@@ -31,7 +30,7 @@ const Sidebar = ({ onPostClick }) => {
           <i className="fas fa-hashtag"></i>
           <span>Explore</span>
         </div>
-        <div className="nav-item">
+        <div className="nav-item" onClick={() => navigate('/notifications')}>
           <i className="fas fa-bell"></i>
           <span>Notifications</span>
         </div>
@@ -59,7 +58,6 @@ const Sidebar = ({ onPostClick }) => {
         <button
         className="post-button"
         onClick={() => {
-          console.log("Post button clicked in Sidebar");
           onPostClick?.();
         }}
       >
