@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { xcloneApi } from "../constants/axios";
 import { postRequests } from "../constants/requests";
 import MainLayout from "../components/MainLayout";
@@ -15,6 +16,7 @@ const HomePage = () => {
   const [isComposerOpen, setIsComposerOpen] = useState(false);
 
   const { appState, dispatch } = useAppStateContext();
+  const navigate = useNavigate();
 
   console.log("AppState:", appState); // Debug log
 
@@ -120,6 +122,15 @@ const HomePage = () => {
     });
   };
 
+  const handlePostClick = (e, postId) => {
+    if (!e?.target) return; 
+    const ignore = e.target.closest(".no-nav");
+    if (!ignore) {
+      navigate(`/posts/${postId}`);
+    }
+  };
+
+
   return (
     <MainLayout
       onPostClick={() => {
@@ -159,12 +170,12 @@ const HomePage = () => {
           </div>
         ) : (
           posts.map((post) => (
-            <div key={post.id} className="post">
-              <div className="compose-avatar">
-                <div className="avatar-placeholder">
-                  {post?.username.charAt(0)}
-                </div>
-              </div>
+            <div
+              key={post.id}
+              className="post"
+              onClick={(e) => handlePostClick(e, post.id)}
+              style={{ cursor: "pointer" }} 
+            >
               <div className="post-content">
                 <div className="post-header">
                   <span className="post-name">{post.name}</span>
@@ -175,11 +186,11 @@ const HomePage = () => {
                   )}
                 </div>
                 <div className="post-text">{post.text}</div>
+  
+                <div className="no-nav">
+                  <PollShowComponent post={post} />
+                </div>
 
-                {/* Poll Component */}
-                <PollShowComponent post={post} />
-
-                {/* Hashtags and Mentions */}
                 {(post.hashtags?.length > 0 || post.mentions?.length > 0) && (
                   <div className="post-tags">
                     {post.hashtags?.map((tag) => (
@@ -195,24 +206,33 @@ const HomePage = () => {
                   </div>
                 )}
 
-                <div className="post-actions">
-                  <div className="action-item">
-                    <i className="fas fa-comment"></i>
-                    <span>{post.comments}</span>
-                  </div>
-                  <div
-                    className="action-item"
-                    onClick={() => handleRetweet(post.id)}
-                  >
-                    <i className="fas fa-retweet"></i>
-                    <span>{post.retweets}</span>
-                  </div>
-                  <PostLikeComponent className={"action-item"} post={post} />
-                  <div className="action-item">
-                    <i className="fas fa-share"></i>
+                <div className="post-actions no-nav">
+                    <div className="action-item">
+                      <i className="fas fa-comment"></i>
+                      <span>{post.comments}</span>
+                    </div>
+                    <div
+                      className="action-item"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleRetweet(post.id);
+                      }}
+                    >
+                      <i className="fas fa-retweet"></i>
+                      <span>{post.retweets}</span>
+                    </div>
+                    <div
+                      className="action-item"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <PostLikeComponent className={"action-item"} post={post} />
+                    </div>
+                    <div className="action-item">
+                      <i className="fas fa-share"></i>
+                    </div>
                   </div>
                 </div>
-              </div>
+        
             </div>
           ))
         )}
