@@ -9,6 +9,7 @@ export const postRequests = {
   createPost: "/api/posts",
   trendingHashtags: "/api/posts/trending/hashtags",
   liveFeeds: "/api/posts/live-feeds",
+  likePost: (postId) => `/api/posts/${postId}/like`,
 };
 
 export const pollRequests = {
