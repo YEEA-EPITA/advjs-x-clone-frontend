@@ -21,6 +21,20 @@ const schema = yup.object().shape({
   })
 });
 
+const extractTags = (text = '') => {
+  const hashtagRe = /#([\p{L}\p{N}_]+)\b/gu;
+  const mentionRe = /@([A-Za-z0-9_]+)\b/g;
+
+  const hashtags = new Set();
+  const mentions = new Set();
+
+  let m;
+  while ((m = hashtagRe.exec(text))) hashtags.add(m[1].toLowerCase());
+  while ((m = mentionRe.exec(text))) mentions.add(m[1]);
+
+  return { hashtags: [...hashtags], mentions: [...mentions] };
+};
+
 const PostComposerInline = () => {
   const [content, setContent] = useState('');
   const [mediaFile, setMediaFile] = useState(null);
@@ -121,11 +135,15 @@ const PostComposerInline = () => {
         }
       }
 
+      const { hashtags, mentions } = extractTags(content || '');
+
       await dispatch(createPost({
         content,
         mediaFile,
         location: locationName || 'Unknown',
-        poll: pollPayload
+        poll: pollPayload,
+        hashtags,   
+        mentions,
       }));
 
       setContent('');
