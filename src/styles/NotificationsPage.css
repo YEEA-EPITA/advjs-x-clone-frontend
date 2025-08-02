@@ -11,6 +11,10 @@
   border-bottom: 1px solid #e6ecf0;
 }
 
+.dark .notification-item {
+  border-bottom: 1px solid #2f3336;
+}
+
 .notification-icon-avatar {
   display: flex;
   align-items: center;
@@ -46,9 +50,17 @@
   margin-bottom: 2px;
 }
 
+.dark .notification-text {
+  color: #e7e9ea;
+}
+
 .notification-time {
   font-size: 13px;
   color: #657786;
+}
+
+.dark .notification-time {
+  color: #71767b;
 }
 
 .notification-tabs {
@@ -60,6 +72,10 @@
   margin-bottom: 8px;
   padding: 16px 16px 0;
   margin-top: 12px;
+}
+
+.dark .notifications-header {
+  border-bottom: 1px solid #2f3336;
 }
 
 .notification-tabs-bar {
@@ -80,8 +96,16 @@
   position: relative;
 }
 
+.dark .tab-item {
+  color: #71767b;
+}
+
 .tab-item.active {
   color: #0f1419;
+}
+
+.dark .tab-item.active {
+  color: #e7e9ea;
 }
 
 .tab-underline {
@@ -104,4 +128,8 @@
   font-size: 18px;
   color: #0f1419;
   cursor: pointer;
+}
+
+.dark .settings-icon {
+  color: #e7e9ea;
 }
