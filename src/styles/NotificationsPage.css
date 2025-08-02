@@ -133,3 +133,48 @@
 .dark .settings-icon {
   color: #e7e9ea;
 }
+
+.notification-empty {
+  text-align: center;
+  padding: 48px 24px;
+  color: #536471;
+}
+
+.notification-empty h2 {
+  font-size: 20px;
+  color: #0f1419;
+  margin: 16px 0 8px;
+}
+
+.notification-empty p {
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.notification-empty a {
+  color: #1da1f2;
+  text-decoration: none;
+}
+
+.notification-empty a:hover {
+  text-decoration: underline;
+}
+
+.empty-image {
+  max-width: 200px;
+  margin-bottom: 16px;
+}
+
+body.dark .notification-text,
+body.dark .notification-time,
+body.dark .tab-item,
+body.dark .notification-empty h2,
+body.dark .notification-empty p,
+body.dark .notification-empty a {
+  color: #e6e6e6;
+}
+
+body.dark .tab-item.active {
+  color: white;
+}
+
