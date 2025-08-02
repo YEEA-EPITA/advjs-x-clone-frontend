@@ -7,6 +7,7 @@ import useAppStateContext from "../hooks/useAppStateContext";
 import PostComposer from "../components/PostComposer";
 import PostComposerInline from "../components/PostComposerInline";
 import PollShowComponent from "../components/PollShowComonent";
+import PostLikeComponent from "../components/PostLikeComponent";
 
 const HomePage = () => {
   const [loading, setLoading] = useState(true);
@@ -52,12 +53,13 @@ const HomePage = () => {
             text: feed.content,
             comments: feed.comment_count,
             retweets: feed.retweet_count,
-            likes: feed.like_count,
+            like_count: feed.like_count,
             location: feed.location,
             hashtags: feed.hashtags,
             mentions: feed.mentions,
             poll: feed.poll,
             media_urls: feed.media_urls,
+            liked_by_me: feed.liked_by_me,
           }));
 
           dispatch({
@@ -106,15 +108,6 @@ const HomePage = () => {
 
     const diffInDays = Math.floor(diffInHours / 24);
     return `${diffInDays}d`;
-  };
-
-  const handleLike = (postId) => {
-    dispatch({
-      type: "LIKE_POST",
-      payload: {
-        postId,
-      },
-    });
   };
 
   const handleRetweet = (postId) => {
@@ -214,16 +207,7 @@ const HomePage = () => {
                     <i className="fas fa-retweet"></i>
                     <span>{post.retweets}</span>
                   </div>
-                  <div
-                    className="action-item"
-                    onClick={() => handleLike(post.id)}
-                    style={{
-                      color: post.likes > 0 ? "var(--accent-red)" : "inherit",
-                    }}
-                  >
-                    <i className="fas fa-heart"></i>
-                    <span>{post.likes}</span>
-                  </div>
+                  <PostLikeComponent className={"action-item"} post={post} />
                   <div className="action-item">
                     <i className="fas fa-share"></i>
                   </div>
