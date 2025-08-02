@@ -16,6 +16,7 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { notificationRequests } from "../constants/requests";
 import { xcloneApi } from "../constants/axios";
+import { useTheme } from "../context/ThemeContext"; 
 
 const typeIconMap = {
   mention: faAt,
@@ -31,6 +32,7 @@ const typeIconMap = {
 const NotificationsPage = () => {
   const [notifications, setNotifications] = useState([]);
   const [activeTab, setActiveTab] = useState("all");
+  const { theme } = useTheme(); 
 
   useEffect(() => {
     const loadNotifications = async () => {
@@ -48,6 +50,8 @@ const NotificationsPage = () => {
   const filtered = notifications.filter((n) =>
     activeTab === "mentions" ? n.type === "mention" : true
   );
+
+  const isDarkMode = theme === "dark"; 
 
   return (
     <MainLayout>

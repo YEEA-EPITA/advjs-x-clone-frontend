@@ -164,3 +164,17 @@
   max-width: 200px;
   margin-bottom: 16px;
 }
+
+body.dark .notification-text,
+body.dark .notification-time,
+body.dark .tab-item,
+body.dark .notification-empty h2,
+body.dark .notification-empty p,
+body.dark .notification-empty a {
+  color: #e6e6e6;
+}
+
+body.dark .tab-item.active {
+  color: white;
+}
+
