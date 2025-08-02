@@ -7,10 +7,7 @@ import {
   faHeart,
   faRetweet,
   faUserPlus,
-  faRightToBracket,
-  faKey,
   faComment,
-  faReply,
   faGear,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -21,12 +18,9 @@ import { useTheme } from "../context/ThemeContext";
 const typeIconMap = {
   mention: faAt,
   like: faHeart,
+  comment: faComment,
   retweet: faRetweet,
   follow: faUserPlus,
-  login: faRightToBracket,
-  password: faKey,
-  comment: faComment,
-  thread: faReply,
 };
 
 const NotificationsPage = () => {
@@ -52,6 +46,21 @@ const NotificationsPage = () => {
   );
 
   const isDarkMode = theme === "dark"; 
+
+  const getIconByNotification = (notification) => {
+    const { type, message } = notification;
+        if (type === "mention") return faAt;
+        if (type === "follow") return faUserPlus;
+
+        if (type === "engagement") {
+            if (message.includes("liked")) return faHeart;
+            if (message.includes("commented")) return faComment;
+            if (message.includes("retweeted")) return faRetweet;
+        }
+
+        return faComment; 
+    };
+
 
   return (
     <MainLayout>
@@ -99,8 +108,8 @@ const NotificationsPage = () => {
                 <div className="notification-icon-avatar">
                 <div className="notification-left-icon">
                     <FontAwesomeIcon
-                    icon={typeIconMap[n.type] || faComment}
-                    style={{ color: "#1DA1F2" }}
+                        icon={getIconByNotification(n)}
+                        style={{ color: "#1DA1F2" }}
                     />
                 </div>
                 <div className="notification-avatar">
