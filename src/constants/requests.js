@@ -15,3 +15,8 @@ export const postRequests = {
 export const pollRequests = {
   votePoll: `/api/polls/vote`,
 };
+
+
+export const notificationRequests = {
+  fetchAll: "/api/notifications",
+};

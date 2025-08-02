@@ -1,6 +1,5 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import MainLayout from "../components/MainLayout";
-import mockNotifications from "../data/mockNotifications";
 import "../styles/NotificationsPage.css";
 import {
   faAt,
@@ -11,9 +10,11 @@ import {
   faKey,
   faComment,
   faReply,
-  faGear, 
+  faGear,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { notificationRequests } from "../constants/requests";
+import { xcloneApi } from "../constants/axios";
 
 const typeIconMap = {
   mention: faAt,
@@ -27,9 +28,23 @@ const typeIconMap = {
 };
 
 const NotificationsPage = () => {
+  const [notifications, setNotifications] = useState([]);
   const [activeTab, setActiveTab] = useState("all");
 
-  const filtered = mockNotifications.filter((n) =>
+  useEffect(() => {
+    const loadNotifications = async () => {
+      try {
+        const res = await xcloneApi.get(notificationRequests.fetchAll);
+        setNotifications(res.data);
+      } catch (err) {
+        console.error("Failed to load notifications", err);
+      }
+    };
+
+    loadNotifications();
+  }, []);
+
+  const filtered = notifications.filter((n) =>
     activeTab === "mentions" ? n.type === "mention" : true
   );
 
@@ -37,11 +52,10 @@ const NotificationsPage = () => {
     <MainLayout>
       <div className="notifications-container">
         <div className="notifications-header">
-           <div className="notifications-header-row">
-                <h2>Notifications</h2>
-                <FontAwesomeIcon icon={faGear} className="settings-icon" />
-            </div>
-
+          <div className="notifications-header-row">
+            <h2>Notifications</h2>
+            <FontAwesomeIcon icon={faGear} className="settings-icon" />
+          </div>
 
           <div className="notification-tabs-bar">
             <div
