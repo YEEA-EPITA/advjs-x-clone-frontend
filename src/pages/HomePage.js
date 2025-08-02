@@ -6,18 +6,18 @@ import "./HomePage.css";
 import useAppStateContext from "../hooks/useAppStateContext";
 import PostComposer from "../components/PostComposer";
 import PostComposerInline from "../components/PostComposerInline";
+import PollShowComponent from "../components/PollShowComonent";
 
 const HomePage = () => {
-  const [tweetText, setTweetText] = useState("");
-  const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [isComposerOpen, setIsComposerOpen] = useState(false); 
+  const [isComposerOpen, setIsComposerOpen] = useState(false);
 
-  const { appState } = useAppStateContext();
-  const firstAlphabet = appState.user?.email?.charAt(0);
+  const { appState, dispatch } = useAppStateContext();
 
-  const socket = appState.socket;
+  console.log("AppState:", appState); // Debug log
+
+  const posts = appState.posts?.list || [];
 
   useEffect(() => {
     const fetchLiveFeeds = async () => {
@@ -35,9 +35,16 @@ const HomePage = () => {
         });
 
         if (response.data.success) {
-          const feeds = response.data.body.feeds || [];
+          const responses = response.data.body;
+          dispatch({
+            type: "SET_POSTS",
+            payload: {
+              list: responses.feeds || [],
+              pagination: responses.pagination || {},
+            },
+          });
           // Transform API data to match our component structure
-          const transformedPosts = feeds.map((feed) => ({
+          const transformedPosts = responses.feeds.map((feed) => ({
             id: feed.id,
             name: feed.username, // Using username as display name
             username: feed.username,
@@ -52,26 +59,19 @@ const HomePage = () => {
             poll: feed.poll,
             media_urls: feed.media_urls,
           }));
-          setPosts(transformedPosts);
+
+          dispatch({
+            type: "SET_POSTS",
+            payload: {
+              list: transformedPosts,
+              pagination: responses.pagination || {},
+            },
+          });
         } else {
           setError("Failed to fetch live feeds");
         }
       } catch (err) {
-        console.error("Error fetching live feeds:", err);
         setError("Failed to fetch live feeds");
-        // Fallback to mock data
-        setPosts([
-          {
-            id: 1,
-            name: "John Doe",
-            username: "johndoe",
-            time: "2h",
-            text: "Just shipped a new feature! Really excited about how this turned out. 🚀",
-            comments: 12,
-            retweets: 5,
-            likes: 24,
-          },
-        ]);
       } finally {
         setLoading(false);
       }
@@ -80,18 +80,18 @@ const HomePage = () => {
     fetchLiveFeeds();
   }, []);
 
-  // Socket listener for live feed updates
-  useEffect(() => {
-    if (!socket) return;
+  // // Socket listener for live feed updates
+  // useEffect(() => {
+  //   if (!socket) return;
 
-    socket.on("new_feed", (data) => {
-      console.log("Live feed:", data);
-    });
+  //   socket.on("new_feed", (data) => {
+  //     console.log("Live feed:", data);
+  //   });
 
-    return () => {
-      socket.off("new_feed");
-    };
-  }, [socket]);
+  //   return () => {
+  //     socket.off("new_feed");
+  //   };
+  // }, [socket]);
 
   const formatTimeAgo = (dateString) => {
     const now = new Date();
@@ -108,43 +108,31 @@ const HomePage = () => {
     return `${diffInDays}d`;
   };
 
-  const handleTweet = () => {
-    if (tweetText.trim()) {
-      const newPost = {
-        id: posts.length + 1,
-        name: "You",
-        username: "you",
-        time: "now",
-        text: tweetText,
-        comments: 0,
-        retweets: 0,
-        likes: 0,
-      };
-      setPosts([newPost, ...posts]);
-      setTweetText("");
-    }
-  };
-
   const handleLike = (postId) => {
-    setPosts(
-      posts.map((post) =>
-        post.id === postId ? { ...post, likes: post.likes + 1 } : post
-      )
-    );
+    dispatch({
+      type: "LIKE_POST",
+      payload: {
+        postId,
+      },
+    });
   };
 
   const handleRetweet = (postId) => {
-    setPosts(
-      posts.map((post) =>
-        post.id === postId ? { ...post, retweets: post.retweets + 1 } : post
-      )
-    );
+    // Increment retweets for the post
+    dispatch({
+      type: "RETWEET_POST",
+      payload: {
+        postId,
+      },
+    });
   };
 
   return (
-    <MainLayout onPostClick={() => {
-      setIsComposerOpen(true);
-    }}>
+    <MainLayout
+      onPostClick={() => {
+        setIsComposerOpen(true);
+      }}
+    >
       <div className="feed-header">
         <h2>Home</h2>
       </div>
@@ -152,7 +140,7 @@ const HomePage = () => {
       <div>
         <PostComposerInline />
       </div>
-    
+
       <div className="posts-container">
         {loading ? (
           <div className="post">
@@ -196,26 +184,7 @@ const HomePage = () => {
                 <div className="post-text">{post.text}</div>
 
                 {/* Poll Component */}
-                {post.poll && (
-                  <div className="poll-container">
-                    <h4>{post.poll.question}</h4>
-                    <div className="poll-options">
-                      {post.poll.options.map((option) => (
-                        <div key={option.id} className="poll-option">
-                          <span>{option.option_text}</span>
-                          <span className="poll-votes">
-                            {option.vote_count} votes
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                    <div className="poll-info">
-                      {post.poll.voted ? "✅ You voted" : "⏱️ Poll active"} •
-                      Expires:{" "}
-                      {new Date(post.poll.expires_at).toLocaleDateString()}
-                    </div>
-                  </div>
-                )}
+                <PollShowComponent post={post} />
 
                 {/* Hashtags and Mentions */}
                 {(post.hashtags?.length > 0 || post.mentions?.length > 0) && (
@@ -266,11 +235,13 @@ const HomePage = () => {
       </div>
       {isComposerOpen && (
         <>
-          <div className="composer-backdrop" onClick={() => setIsComposerOpen(false)} />
+          <div
+            className="composer-backdrop"
+            onClick={() => setIsComposerOpen(false)}
+          />
           <PostComposer onClose={() => setIsComposerOpen(false)} />
         </>
       )}
-
     </MainLayout>
   );
 };
