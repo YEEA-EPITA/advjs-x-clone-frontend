@@ -270,3 +270,30 @@
   align-items: center;
   gap: 4px;
 }
+
+body.dark .post-detail-card {
+  background-color: #222324; 
+  color: #e1e8ed;
+  border: 1px solid #2f3336;
+}
+
+body.dark .post-time-location,
+body.dark .user-handle,
+body.dark .comment-time,
+body.dark .post-meta {
+  color: #8899a6;
+}
+
+body.dark .post-content-text,
+body.dark .comment-content,
+body.dark .user-name,
+body.dark .retweet-user,
+body.dark .retweet-content {
+  color: #e1e8ed;
+}
+
+body.dark .hashtag,
+body.dark .mention {
+  background-color: #22303c;
+  color: #1da1f2;
+}

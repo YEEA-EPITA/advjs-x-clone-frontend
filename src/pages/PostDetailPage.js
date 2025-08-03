@@ -19,6 +19,7 @@ import "../components/PollShowComponent.css";
 import useAppStateContext from "../hooks/useAppStateContext";
 import CommentModal from "../components/CommentModal"; 
 import PostComposer from "../components/PostComposer";
+import { useTheme } from "../context/ThemeContext"; 
 
 const PostDetailPage = () => {
   const { postId } = useParams();
@@ -31,6 +32,7 @@ const PostDetailPage = () => {
   const [showComposer, setShowComposer] = useState(false);
   const [retweetSource, setRetweetSource] = useState(null);
   const [showRetweetMenu, setShowRetweetMenu] = useState(false);
+  const { theme } = useTheme();
 
   useEffect(() => {
     const fetchAnalytics = async () => {
@@ -159,7 +161,6 @@ const highlightContent = (text) => {
   });
 };
 
-
   if (loading) {
     return (
       <MainLayout>
@@ -179,6 +180,7 @@ const highlightContent = (text) => {
   return (
     <MainLayout>
       <div className="post-detail-page">
+      {/* <div className={`post-detail-page ${isDarkMode ? "dark-mode" : ""}`}> */}
         <div className="post-detail-header">
           <FaArrowLeft className="back-icon" onClick={() => navigate("/home")} />
           <span>Post</span>
