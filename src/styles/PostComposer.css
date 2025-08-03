@@ -343,3 +343,38 @@ body.dark .submit-btn {
 body.dark .composer-overlay {
   background-color: rgba(0, 0, 0, 0.7);
 }
+
+.retweet-preview-card {
+  background-color: #f5f8fa;
+  border: 1px solid #e1e8ed;
+  border-radius: 12px;
+  padding: 12px;
+  margin-top: 12px;
+}
+
+.retweet-user-info {
+  font-weight: bold;
+  display: flex;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.retweet-username {
+  color: #14171a;
+}
+
+.retweet-handle {
+  color: #657786;
+  font-weight: normal;
+}
+
+.retweet-content {
+  color: #0f1419;
+  margin-bottom: 8px;
+}
+
+.retweet-media img {
+  max-width: 100%;
+  border-radius: 8px;
+  margin-top: 6px;
+}

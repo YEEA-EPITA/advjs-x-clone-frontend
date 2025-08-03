@@ -10,6 +10,10 @@ export const postRequests = {
   trendingHashtags: "/api/posts/trending/hashtags",
   liveFeeds: "/api/posts/live-feeds",
   likePost: (postId) => `/api/posts/${postId}/like`,
+  postAnalytics: (postId) => `/api/posts/${postId}/analytics`,
+  getPollByPostId: (postId) => `/api/posts/${postId}/polls`, 
+  addComment: (postId) => `api/posts/${postId}/comments`,
+  retweetPost: (postId) => `api/posts/${postId}/retweet`,
 };
 
 export const pollRequests = {

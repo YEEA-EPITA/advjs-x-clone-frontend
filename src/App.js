@@ -6,6 +6,7 @@ import NotificationsPage from "./pages/NotificationsPage";
 import PublicRoute from "./routes/PublicRoute";
 import PrivateRoute from "./routes/PrivateRoute";
 import AuthPage from "./pages/AuthPage";
+import PostDetailPage from "./pages/PostDetailPage";
 import { ThemeProvider } from "./context/ThemeContext";
 
 
@@ -22,6 +23,7 @@ const App = () => {
         <Route element={<PrivateRoute />}>
           <Route path="/home" element={<HomePage />} />
           <Route path="/notifications" element={<NotificationsPage />} />
+          <Route path="/posts/:postId" element={<PostDetailPage />} />
         </Route>
 
         {/* Fallback */}

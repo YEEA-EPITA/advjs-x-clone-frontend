@@ -30,7 +30,7 @@ const extractTags = (text = '') => {
   return { hashtags: [...hashtags], mentions: [...mentions] };
 };
 
-const PostComposer = ({ onClose }) => {
+const PostComposer = ({ onClose, originalPost = null }) => {
   const dispatch = useDispatch();
   const fileInputRef = useRef(null);
   const audienceOptions = ['Everyone', 'Followers', 'Only Me'];
@@ -131,7 +131,8 @@ const PostComposer = ({ onClose }) => {
         location: locationName || 'Unknown',
         poll: pollPayload,
         hashtags,   
-        mentions,   
+        mentions, 
+          
       }));
 
       onClose?.();
@@ -235,6 +236,23 @@ const PostComposer = ({ onClose }) => {
               >
                 Remove poll
               </button>
+            </div>
+          )}
+
+          {originalPost && (
+            <div className="retweet-preview-card">
+              <div className="retweet-user-info">
+                <span className="retweet-username">{originalPost.username}</span>
+                <span className="retweet-handle">@{originalPost.username}</span>
+              </div>
+              <div className="retweet-content">{originalPost.content}</div>
+              {originalPost.media_urls?.length > 0 && (
+                <div className="retweet-media">
+                  {originalPost.media_urls.map((url, idx) => (
+                    <img key={idx} src={url} alt={`media-${idx}`} />
+                  ))}
+                </div>
+              )}
             </div>
           )}
 
