@@ -143,7 +143,8 @@ const PostComposer = ({ onClose, originalPost = null }) => {
 
   return (
     <div className="composer-overlay">
-      <div className="composer-modal">
+      <div className={`composer-modal ${mediaFile || showPoll ? 'expanded' : ''}`}>
+      <div className="composer-modal-inner"></div>
         <button className="close-btn" onClick={onClose}>✕</button>
         <div className="draft-link">Drafts</div>
 
@@ -169,6 +170,16 @@ const PostComposer = ({ onClose, originalPost = null }) => {
             placeholder="What’s happening?"
             {...register('content')}
           />
+
+          {mediaFile && (
+            <div className="media-preview">
+              <img
+                src={URL.createObjectURL(mediaFile)}
+                alt="Uploaded preview"
+                className="uploaded-image"
+              />
+            </div>
+          )}
           {errors.content && <p className="error-text">{errors.content.message}</p>}
 
           {locationName && <div className="location-display">📍 {locationName}</div>}
@@ -286,11 +297,11 @@ const PostComposer = ({ onClose, originalPost = null }) => {
             <button className="submit-btn" type="submit" disabled={isSubmitting || isFetchingLocation}>
               Post
             </button>
-          </div>
-          {isSubmitting && <LoaderBar />}
-        </form>
+            </div>
+            {isSubmitting && <LoaderBar />}
+          </form>
+        </div>
       </div>
-    </div>
   );
 };
 

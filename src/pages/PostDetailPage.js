@@ -180,7 +180,6 @@ const highlightContent = (text) => {
   return (
     <MainLayout>
       <div className="post-detail-page">
-      {/* <div className={`post-detail-page ${isDarkMode ? "dark-mode" : ""}`}> */}
         <div className="post-detail-header">
           <FaArrowLeft className="back-icon" onClick={() => navigate("/home")} />
           <span>Post</span>

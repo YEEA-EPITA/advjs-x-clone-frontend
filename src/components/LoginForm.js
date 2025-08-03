@@ -38,8 +38,6 @@ const LoginForm = () => {
     try {
       const res = await xcloneApi.post(userRequests.login, { email, password });
       
-      console.log('Login response:', res.data); // Debug log
-      
       // Store the complete user data with token
       const userData = {
         token: res.data.token || res.data.body?.token, // Handle different response structures

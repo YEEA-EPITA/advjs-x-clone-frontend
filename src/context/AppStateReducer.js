@@ -178,7 +178,6 @@ const AppStateReducer = (state, action) => {
         },
       };
 
-    
     case "CACHE_POLL_VOTE":
       return {
         ...state,
