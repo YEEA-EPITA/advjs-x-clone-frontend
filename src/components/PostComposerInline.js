@@ -183,6 +183,16 @@ const PostComposerInline = () => {
           onChange={(e) => setContent(e.target.value)}
         />
 
+        {mediaFile && (
+            <div className="media-preview">
+              <img
+                src={URL.createObjectURL(mediaFile)}
+                alt="Uploaded preview"
+                className="uploaded-image"
+              />
+            </div>
+          )}
+
         <form onSubmit={handleSubmit(onSubmit)}>
           {showPoll && (
             <div className="poll-section">

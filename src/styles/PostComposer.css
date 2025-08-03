@@ -9,6 +9,11 @@
   font-family: sans-serif;
 }
 
+.composer-modal-inner {
+  overflow-y: auto;
+  flex: 1;
+}
+
 .close-btn {
   position: absolute;
   top: 16px;
@@ -157,7 +162,9 @@
   z-index: 2000;
   display: flex;
   justify-content: center;
+  /* overflow: auto;  */
   align-items: center;
+  overflow-y: auto; 
 }
 
 .composer-inline {
@@ -377,4 +384,20 @@ body.dark .composer-overlay {
   max-width: 100%;
   border-radius: 8px;
   margin-top: 6px;
+}
+
+.media-preview {
+  margin: 10px 0;
+}
+
+.uploaded-image {
+  max-width: 100%;
+  max-height: 300px;
+  border-radius: 12px;
+  object-fit: contain;
+}
+
+.composer-modal.expanded {
+  max-height: 90vh;
+  overflow-y: auto;
 }
