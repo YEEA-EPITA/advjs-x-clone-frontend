@@ -10,6 +10,7 @@ import {
   FaRetweet,
   FaHeart,
   FaShare,
+  FaQuoteRight,
 } from "react-icons/fa";
 import { PiSealCheckFill } from "react-icons/pi";
 import PostLikeComponent from "../components/PostLikeComponent";
@@ -17,6 +18,7 @@ import PollShowComponent from "../components/PollShowComponent";
 import "../components/PollShowComponent.css";
 import useAppStateContext from "../hooks/useAppStateContext";
 import CommentModal from "../components/CommentModal"; 
+import PostComposer from "../components/PostComposer";
 
 const PostDetailPage = () => {
   const { postId } = useParams();
@@ -26,6 +28,9 @@ const PostDetailPage = () => {
   const navigate = useNavigate();
   const { appState } = useAppStateContext();
   const [showCommentModal, setShowCommentModal] = useState(false); 
+  const [showComposer, setShowComposer] = useState(false);
+  const [retweetSource, setRetweetSource] = useState(null);
+  const [showRetweetMenu, setShowRetweetMenu] = useState(false);
 
   useEffect(() => {
     const fetchAnalytics = async () => {
@@ -64,7 +69,6 @@ const PostDetailPage = () => {
 
     fetchAnalytics();
     fetchPoll();
-  // }, [postId]);
   }, [postId, appState.pollVotes]);
 
   const handleSubmitComment = async (content) => {
@@ -79,7 +83,6 @@ const PostDetailPage = () => {
     if (response.data.success) {
       const newComment = response.data.comment;
 
-      // 기존 comments에 추가
       setAnalytics((prev) => ({
         ...prev,
         comment_count: prev.comment_count + 1,
@@ -102,6 +105,34 @@ const formatTimeAgo = (dateString) => {
   if (diffInHours < 24) return `${diffInHours}h ago`;
   const diffInDays = Math.floor(diffInHours / 24);
   return `${diffInDays}d ago`;
+};
+
+const handleRepost = async () => {
+  try {
+    const token = JSON.parse(localStorage.getItem("user"))?.token;
+
+    const response = await xcloneApi.post(
+      postRequests.retweetPost(postId),
+      {},
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+
+    if (response.data.success) {
+      const { retweetCount, isRetweeted } = response.data;
+
+      setAnalytics((prev) => ({
+        ...prev,
+        retweet_count: retweetCount ?? prev.retweet_count,
+        isRetweeted: isRetweeted,
+      }));
+    }
+
+    setShowRetweetMenu(false);
+  } catch (error) {
+    console.error("Repost failed:", error);
+  }
 };
 
   if (loading) {
@@ -149,6 +180,22 @@ const formatTimeAgo = (dateString) => {
           </div>
 
           <div className="post-content-text">{analytics.content}</div>
+          
+          {analytics?.retweeted_post && (
+            <div className="retweet-wrapper">
+              <div className="retweet-user">@{analytics.retweeted_post.username}</div>
+              <div className="retweet-content">{analytics.retweeted_post.content}</div>
+
+              {analytics.retweeted_post.media_urls?.length > 0 && (
+                <div className="retweet-media">
+                  {analytics.retweeted_post.media_urls.map((url, idx) => (
+                    <img key={idx} src={url} alt="retweet-media" />
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
           {analytics.media_urls?.length > 0 && (
             <div className="post-media">
               {analytics.media_urls.map((url, idx) => (
@@ -177,10 +224,6 @@ const formatTimeAgo = (dateString) => {
           </div>
 
           <div className="post-detail-action-bar">
-            {/* <div className="post-detail-action">
-              <FaRegComment className="post-detail-icon" />
-              <span>{analytics.comment_count}</span>
-            </div> */}
             <div
               className="post-detail-action"
               onClick={() => setShowCommentModal(true)}
@@ -188,10 +231,39 @@ const formatTimeAgo = (dateString) => {
               <FaRegComment className="post-detail-icon" />
               <span>{analytics.comment_count}</span>
             </div>
-            <div className="post-detail-action">
-              <FaRetweet className="post-detail-icon" />
-              <span>{analytics.retweet_count}</span>
+
+            <div className="post-detail-action retweet-wrapper">
+              <FaRetweet
+                className="post-detail-icon"
+                onClick={() => setShowRetweetMenu(!showRetweetMenu)}
+              />
+              <span>{analytics.retweet_count ?? 0}</span>
+
+
+              {showRetweetMenu && (
+                <div className="retweet-menu">
+                  <div
+                    className="retweet-menu-item"
+                    onClick={handleRepost}
+                  >
+                    <FaRetweet className="retweet-menu-icon" />
+                    <span>Repost</span>
+                  </div>
+                  <div
+                    className="retweet-menu-item"
+                    onClick={() => {
+                      setRetweetSource(analytics);
+                      setShowComposer(true);
+                      setShowRetweetMenu(false);
+                    }}
+                  >
+                    <FaQuoteRight className="retweet-menu-icon" />
+                    <span>Quote</span>
+                  </div>
+                </div>
+              )}
             </div>
+
             <div className="post-detail-action">
               <PostLikeComponent post={analytics} className="post-detail-icon" />
             </div>
@@ -213,7 +285,6 @@ const formatTimeAgo = (dateString) => {
                   <PiSealCheckFill className="verified-icon" />
                   <span className="user-handle">@{comment.username}</span>
                 </div>
-                {/* <div className="comment-content">{comment.content}</div> */}
                 <div className="comment-content">
                   {comment.content}
                   <span className="comment-time"> · {formatTimeAgo(comment.created_at)}</span>
@@ -223,14 +294,25 @@ const formatTimeAgo = (dateString) => {
             </div>
           </div>
         ))}
-      </div>
-      {showCommentModal && (
-        <CommentModal
-          onClose={() => setShowCommentModal(false)}
-          onSubmit={handleSubmitComment}
-        />
-      )}
+        
+        {showCommentModal && (
+          <CommentModal
+            onClose={() => setShowCommentModal(false)}
+            onSubmit={handleSubmitComment}
+            post={analytics}
+          />
+        )}
 
+        {showComposer && (
+          <>
+            <div className="composer-backdrop" onClick={() => setShowComposer(false)} />
+            <PostComposer
+              onClose={() => setShowComposer(false)}
+              originalPost={retweetSource}
+            />
+          </>
+        )}
+      </div>
     </MainLayout>
   );
 };

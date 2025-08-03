@@ -207,3 +207,29 @@
   font-size: 15px;
 }
 
+.retweet-menu {
+  position: absolute;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  margin-top: 8px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  z-index: 100;
+}
+
+.retweet-menu-item {
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.retweet-menu-item:hover {
+  background-color: #f5f5f5;
+}
+.retweet-menu-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  gap: 8px; 
+  cursor: pointer;
+  font-size: 14px;
+}
