@@ -6,17 +6,20 @@ import NotificationsPage from "./pages/NotificationsPage";
 import PublicRoute from "./routes/PublicRoute";
 import PrivateRoute from "./routes/PrivateRoute";
 import AuthPage from "./pages/AuthPage";
+import LandingPage from "./pages/LandingPage";
 import PostDetailPage from "./pages/PostDetailPage";
 import { ThemeProvider } from "./context/ThemeContext";
-
 
 const App = () => {
   return (
     <ThemeProvider>
       <Routes>
+        {/* Landing Page */}
+
         {/* Public Routes */}
         <Route element={<PublicRoute />}>
-          <Route path="/auth" element={<AuthPage />} /> 
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/auth" element={<AuthPage />} />
         </Route>
 
         {/* Private Routes */}
