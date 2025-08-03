@@ -14,11 +14,12 @@
   --accent-blue-hover: #1a8cd8;
   --accent-red: #f91880;
   --accent-green: #00ba7c;
-  
+
   background-color: var(--bg-primary);
   color: var(--text-primary);
   min-height: 100vh;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+    Arial, sans-serif;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
@@ -52,20 +53,79 @@
 }
 
 /* Responsive Design */
+
+/* Large screens and desktop */
+@media (min-width: 1201px) {
+  .layout-content {
+    max-width: 1200px;
+  }
+}
+
+/* Medium to large tablets and small desktops */
+@media (max-width: 1200px) {
+  .layout-content {
+    max-width: 100%;
+  }
+
+  .main-content {
+    margin-left: 240px;
+  }
+}
+
+/* Hide right sidebar on smaller screens */
 @media (max-width: 1024px) {
   .main-content {
     margin-right: 0;
   }
 }
 
-@media (max-width: 768px) {
+/* Medium tablets */
+@media (max-width: 992px) {
   .main-content {
-    margin-left: 68px;
+    margin-left: 200px;
   }
 }
 
+/* Small tablets */
+@media (max-width: 768px) {
+  .main-content {
+    margin-left: 68px;
+    padding-top: 65px; /* Space for mobile header */
+    padding-bottom: 80px; /* Space for mobile navbar */
+  }
+}
+
+/* Mobile phones */
 @media (max-width: 600px) {
   .main-content {
     margin-left: 0;
+    padding-top: 65px; /* Space for mobile header */
+    padding-bottom: 80px; /* Space for mobile navbar */
   }
+
+  .layout-content {
+    flex-direction: column;
+  }
+}
+
+/* Extra small devices */
+@media (max-width: 480px) {
+  .main-content {
+    padding-top: 65px; /* Space for mobile header */
+    padding-bottom: 85px; /* Slightly more space for mobile navbar */
+  }
+}
+
+/* Landscape orientation adjustments */
+@media (max-width: 768px) and (orientation: landscape) {
+  .main-content {
+    margin-left: 60px;
+    padding-top: 55px; /* Reduced space for mobile header in landscape */
+    padding-bottom: 70px;
+  }
+}
+
+/* Smooth transitions */
+.main-content {
+  transition: margin-left 0.3s ease, padding-bottom 0.3s ease;
 }
