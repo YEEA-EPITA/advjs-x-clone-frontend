@@ -12,7 +12,7 @@ export const postRequests = {
   likePost: (postId) => `/api/posts/${postId}/like`,
   postAnalytics: (postId) => `/api/posts/${postId}/analytics`,
   getPollByPostId: (postId) => `/api/posts/${postId}/polls`, 
-  getSinglePost: (postId) => `/api/posts/${postId}`,
+  addComment: (postId) => `api/posts/${postId}/comments`,
 };
 
 export const pollRequests = {

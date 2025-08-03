@@ -16,7 +16,7 @@ import PostLikeComponent from "../components/PostLikeComponent";
 import PollShowComponent from "../components/PollShowComponent";
 import "../components/PollShowComponent.css";
 import useAppStateContext from "../hooks/useAppStateContext";
-
+import CommentModal from "../components/CommentModal"; 
 
 const PostDetailPage = () => {
   const { postId } = useParams();
@@ -25,6 +25,7 @@ const PostDetailPage = () => {
   const [poll, setPoll] = useState(null);
   const navigate = useNavigate();
   const { appState } = useAppStateContext();
+  const [showCommentModal, setShowCommentModal] = useState(false); 
 
   useEffect(() => {
     const fetchAnalytics = async () => {
@@ -65,6 +66,43 @@ const PostDetailPage = () => {
     fetchPoll();
   // }, [postId]);
   }, [postId, appState.pollVotes]);
+
+  const handleSubmitComment = async (content) => {
+  try {
+    const token = JSON.parse(localStorage.getItem("user"))?.token;
+    const response = await xcloneApi.post(
+      postRequests.addComment(postId),
+      { content },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    if (response.data.success) {
+      const newComment = response.data.comment;
+
+      // 기존 comments에 추가
+      setAnalytics((prev) => ({
+        ...prev,
+        comment_count: prev.comment_count + 1,
+        comments: [newComment, ...(prev.comments || [])],
+      }));
+    }
+  } catch (err) {
+    console.error("Failed to submit comment", err);
+  }
+};
+
+const formatTimeAgo = (dateString) => {
+  const now = new Date();
+  const past = new Date(dateString);
+  const diffInMinutes = Math.floor((now - past) / (1000 * 60));
+
+  if (diffInMinutes < 1) return "Just now";
+  if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
+  const diffInHours = Math.floor(diffInMinutes / 60);
+  if (diffInHours < 24) return `${diffInHours}h ago`;
+  const diffInDays = Math.floor(diffInHours / 24);
+  return `${diffInDays}d ago`;
+};
 
   if (loading) {
     return (
@@ -139,7 +177,14 @@ const PostDetailPage = () => {
           </div>
 
           <div className="post-detail-action-bar">
-            <div className="post-detail-action">
+            {/* <div className="post-detail-action">
+              <FaRegComment className="post-detail-icon" />
+              <span>{analytics.comment_count}</span>
+            </div> */}
+            <div
+              className="post-detail-action"
+              onClick={() => setShowCommentModal(true)}
+            >
               <FaRegComment className="post-detail-icon" />
               <span>{analytics.comment_count}</span>
             </div>
@@ -168,12 +213,24 @@ const PostDetailPage = () => {
                   <PiSealCheckFill className="verified-icon" />
                   <span className="user-handle">@{comment.username}</span>
                 </div>
-                <div className="comment-content">{comment.content}</div>
+                {/* <div className="comment-content">{comment.content}</div> */}
+                <div className="comment-content">
+                  {comment.content}
+                  <span className="comment-time"> · {formatTimeAgo(comment.created_at)}</span>
+                </div>
+
               </div>
             </div>
           </div>
         ))}
       </div>
+      {showCommentModal && (
+        <CommentModal
+          onClose={() => setShowCommentModal(false)}
+          onSubmit={handleSubmitComment}
+        />
+      )}
+
     </MainLayout>
   );
 };
