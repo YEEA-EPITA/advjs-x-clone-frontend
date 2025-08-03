@@ -4,6 +4,8 @@ import { postRequests } from "../constants/requests";
 import MainLayout from "../components/MainLayout";
 import "../styles/HomePage.css";
 import useAppStateContext from "../hooks/useAppStateContext";
+import ImageModal from "../components/ImageModal"; 
+import SinglePost from "../components/SinglePost";
 
 const HomePage = () => {
   const [tweetText, setTweetText] = useState("");
@@ -257,205 +259,28 @@ const HomePage = () => {
           </div>
         ) : (
           posts.map((post) => (
-            <div key={post.id} className="post">
-              <div className="compose-avatar">
-                <div className="avatar-placeholder">{firstAlphabet}</div>
-              </div>
-              <div className="post-content">
-                <div className="post-header">
-                  <span className="post-name">{post.name}</span>
-                  <span className="post-username">@{post.username}</span>
-                  <span className="post-time">· {post.time}</span>
-                  {post.location && (
-                    <span className="post-location">📍 {post.location}</span>
-                  )}
-                </div>
-                <div className="post-text">{post.text}</div>
+            <SinglePost
+                post={post}
+                firstAlphabet={post.username?.charAt(0) || "U"}
+                onImageClick={handleImageClick}
+                onLike={handleLike}
+                onRetweet={handleRetweet}
+                />
 
-                {/* Media Images */}
-                {post.media_urls && post.media_urls.length > 0 && (
-                  <div className="post-media">
-                    {post.media_urls.length === 1 ? (
-                      <div className="single-image">
-                        <img
-                          src={post.media_urls[0]}
-                          alt="Post media"
-                          className="post-image"
-                          onClick={() => handleImageClick(post.media_urls, 0)}
-                          onError={(e) => {
-                            e.target.style.display = 'none';
-                          }}
-                        />
-                      </div>
-                    ) : post.media_urls.length === 2 ? (
-                      <div className="two-images">
-                        {post.media_urls.map((url, index) => (
-                          <img
-                            key={index}
-                            src={url}
-                            alt={`Post media ${index + 1}`}
-                            className="post-image"
-                            onClick={() => handleImageClick(post.media_urls, index)}
-                            onError={(e) => {
-                              e.target.style.display = 'none';
-                            }}
-                          />
-                        ))}
-                      </div>
-                    ) : post.media_urls.length === 3 ? (
-                      <div className="three-images">
-                        <div className="main-image">
-                          <img
-                            src={post.media_urls[0]}
-                            alt="Post media 1"
-                            className="post-image"
-                            onClick={() => handleImageClick(post.media_urls, 0)}
-                            onError={(e) => {
-                              e.target.style.display = 'none';
-                            }}
-                          />
-                        </div>
-                        <div className="side-images">
-                          {post.media_urls.slice(1).map((url, index) => (
-                            <img
-                              key={index + 1}
-                              src={url}
-                              alt={`Post media ${index + 2}`}
-                              className="post-image"
-                              onClick={() => handleImageClick(post.media_urls, index + 1)}
-                              onError={(e) => {
-                                e.target.style.display = 'none';
-                              }}
-                            />
-                          ))}
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="four-images">
-                        {post.media_urls.slice(0, 4).map((url, index) => (
-                          <img
-                            key={index}
-                            src={url}
-                            alt={`Post media ${index + 1}`}
-                            className="post-image"
-                            onClick={() => handleImageClick(post.media_urls, index)}
-                            onError={(e) => {
-                              e.target.style.display = 'none';
-                            }}
-                          />
-                        ))}
-                        {post.media_urls.length > 4 && (
-                          <div className="more-images-overlay">
-                            +{post.media_urls.length - 4} more
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* Poll Component */}
-                {post.poll && (
-                  <div className="poll-container">
-                    <h4>{post.poll.question}</h4>
-                    <div className="poll-options">
-                      {post.poll.options.map((option) => (
-                        <div key={option.id} className="poll-option">
-                          <span>{option.option_text}</span>
-                          <span className="poll-votes">
-                            {option.vote_count} votes
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                    <div className="poll-info">
-                      {post.poll.voted ? "✅ You voted" : "⏱️ Poll active"} •
-                      Expires:{" "}
-                      {new Date(post.poll.expires_at).toLocaleDateString()}
-                    </div>
-                  </div>
-                )}
-
-                {/* Hashtags and Mentions */}
-                {(post.hashtags?.length > 0 || post.mentions?.length > 0) && (
-                  <div className="post-tags">
-                    {post.hashtags?.map((tag) => (
-                      <span key={tag} className="hashtag">
-                        #{tag}
-                      </span>
-                    ))}
-                    {post.mentions?.map((mention) => (
-                      <span key={mention} className="mention">
-                        @{mention}
-                      </span>
-                    ))}
-                  </div>
-                )}
-
-                <div className="post-actions">
-                  <div className="action-item">
-                    <i className="fas fa-comment"></i>
-                    <span>{post.comments}</span>
-                  </div>
-                  <div
-                    className="action-item"
-                    onClick={() => handleRetweet(post.id)}
-                  >
-                    <i className="fas fa-retweet"></i>
-                    <span>{post.retweets}</span>
-                  </div>
-                  <div
-                    className="action-item"
-                    onClick={() => handleLike(post.id)}
-                    style={{
-                      color: post.likes > 0 ? "var(--accent-red)" : "inherit",
-                    }}
-                  >
-                    <i className="fas fa-heart"></i>
-                    <span>{post.likes}</span>
-                  </div>
-                  <div className="action-item">
-                    <i className="fas fa-share"></i>
-                  </div>
-                </div>
-              </div>
-            </div>
           ))
         )}
       </div>
 
-      {/* Image Modal */}
-      {showModal && (
-        <div className="image-modal" onClick={handleModalClick}>
-          <div className="image-modal-content">
-            <button className="image-modal-close" onClick={handleCloseModal}>
-              <i className="fas fa-times"></i>
-            </button>
-            
-            {modalImages.length > 1 && (
-              <>
-                <button className="image-modal-nav image-modal-prev" onClick={handlePrevImage}>
-                  <i className="fas fa-chevron-left"></i>
-                </button>
-                <button className="image-modal-nav image-modal-next" onClick={handleNextImage}>
-                  <i className="fas fa-chevron-right"></i>
-                </button>
-              </>
-            )}
-            
-            <img
-              src={modalImages[currentImageIndex]}
-              alt={`Image ${currentImageIndex + 1}`}
-            />
-            
-            {modalImages.length > 1 && (
-              <div className="image-modal-counter">
-                {currentImageIndex + 1} / {modalImages.length}
-              </div>
-            )}
-          </div>
-        </div>
-      )}
+        <ImageModal
+        images={modalImages}
+        isOpen={showModal}
+        currentIndex={currentImageIndex}
+        onClose={handleCloseModal}
+        onNext={handleNextImage}
+        onPrev={handlePrevImage}
+        onBackgroundClick={handleModalClick}
+        />
+
     </MainLayout>
   );
 };

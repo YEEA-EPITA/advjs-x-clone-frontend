@@ -26,7 +26,7 @@ const RightSidebar = () => {
     const fetchTrends = async () => {
       try {
         setLoading(true);
-        const response = await xcloneApi.get(`${postRequests.trendingHashtags}?limit=5&hours=24`);
+        const response = await xcloneApi.get(`${postRequests.trendingHashtags}?limit=5&hours=48`);
         
         if (response.data.success) {
           setTrends(response.data.trends || []);
