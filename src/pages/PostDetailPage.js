@@ -12,8 +12,11 @@ import {
   FaShare,
 } from "react-icons/fa";
 import { PiSealCheckFill } from "react-icons/pi";
-import PollComponentDetail from "../components/PollComponentDetail";
 import PostLikeComponent from "../components/PostLikeComponent";
+import PollShowComponent from "../components/PollShowComponent";
+import "../components/PollShowComponent.css";
+import useAppStateContext from "../hooks/useAppStateContext";
+
 
 const PostDetailPage = () => {
   const { postId } = useParams();
@@ -21,6 +24,7 @@ const PostDetailPage = () => {
   const [loading, setLoading] = useState(true);
   const [poll, setPoll] = useState(null);
   const navigate = useNavigate();
+  const { appState } = useAppStateContext();
 
   useEffect(() => {
     const fetchAnalytics = async () => {
@@ -48,6 +52,8 @@ const PostDetailPage = () => {
             options: options || [],
             total_votes:
               options?.reduce((sum, opt) => sum + (opt.vote_count || 0), 0) || 0,
+            voted: !!appState.pollVotes?.[pollData.id], 
+            selected_option_id: appState.pollVotes?.[pollData.id] || null, 
           });
         }
       } catch (err) {
@@ -57,7 +63,8 @@ const PostDetailPage = () => {
 
     fetchAnalytics();
     fetchPoll();
-  }, [postId]);
+  // }, [postId]);
+  }, [postId, appState.pollVotes]);
 
   if (loading) {
     return (
@@ -104,18 +111,17 @@ const PostDetailPage = () => {
           </div>
 
           <div className="post-content-text">{analytics.content}</div>
-
-          {analytics.media_urls.length > 0 && (
+          {analytics.media_urls?.length > 0 && (
             <div className="post-media">
               {analytics.media_urls.map((url, idx) => (
                 <img src={url} alt={`media-${idx}`} key={idx} />
               ))}
             </div>
           )}
-
+        
           {poll && (
-            <div style={{ marginTop: "1rem" }}>
-              <PollComponentDetail post={{ ...analytics, poll }} />
+            <div>
+              <PollShowComponent post={{ ...analytics, poll }} />
             </div>
           )}
 

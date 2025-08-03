@@ -178,9 +178,20 @@ const AppStateReducer = (state, action) => {
         },
       };
 
+    
+    case "CACHE_POLL_VOTE":
+      return {
+        ...state,
+        pollVotes: {
+          ...state.pollVotes,
+          [action.payload.pollId]: action.payload.optionId,
+        },
+      };
+
     default:
       return state;
   }
+  
 };
 
 export default AppStateReducer;

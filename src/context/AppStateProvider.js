@@ -15,6 +15,10 @@ const INITIAL_STATE = {
       : null,
   socket: null, // placeholder
   postsList: [],
+  pollVotes:
+    typeof window !== "undefined"
+      ? JSON.parse(localStorage.getItem("pollVotes")) || {}
+      : {},
 };
 
 export const AppStateContext = createContext(INITIAL_STATE);

@@ -46,6 +46,19 @@ const PollShowComponent = ({ post }) => {
             optionId: optionId,
           },
         });
+        
+        dispatch({
+          type: "CACHE_POLL_VOTE",
+          payload: { pollId: post.poll.id, optionId },
+        });
+
+        localStorage.setItem(
+          "pollVotes",
+          JSON.stringify({
+            ...(JSON.parse(localStorage.getItem("pollVotes")) || {}),
+            [post.poll.id]: optionId,
+          })
+        );
       }
     } catch (error) {
       console.error("Error voting:", error);

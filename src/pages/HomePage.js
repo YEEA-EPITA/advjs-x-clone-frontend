@@ -7,7 +7,7 @@ import "./HomePage.css";
 import useAppStateContext from "../hooks/useAppStateContext";
 import PostComposer from "../components/PostComposer";
 import PostComposerInline from "../components/PostComposerInline";
-import PollShowComponent from "../components/PollShowComonent";
+import PollShowComponent from "../components/PollShowComponent";
 import PostLikeComponent from "../components/PostLikeComponent";
 
 const HomePage = () => {
