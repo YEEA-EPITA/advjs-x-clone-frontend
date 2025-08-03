@@ -135,6 +135,31 @@ const handleRepost = async () => {
   }
 };
 
+const highlightContent = (text) => {
+  const regex = /(#\w+)|(@\w+)/g;
+  const parts = text.split(regex);
+
+  return parts.map((part, index) => {
+    if (!part) return null;
+    if (part.startsWith("#")) {
+      return (
+        <span key={index} className="hashtag">
+          {part}
+        </span>
+      );
+    } else if (part.startsWith("@")) {
+      return (
+        <span key={index} className="mention">
+          {part}
+        </span>
+      );
+    } else {
+      return <span key={index}>{part}</span>;
+    }
+  });
+};
+
+
   if (loading) {
     return (
       <MainLayout>
@@ -172,14 +197,32 @@ const handleRepost = async () => {
               </div>
               <div className="post-time-location">
                 <span>{new Date(analytics.created_at).toLocaleString()}</span>
-                {analytics.location && (
-                  <span className="post-location">📍 {analytics.location}</span>
-                )}
+                <span style={{ marginLeft: "auto" }}>
+                  {analytics.location && (
+                    <span className="post-location">📍 {analytics.location}</span>
+                  )}
+                </span>
               </div>
             </div>
           </div>
 
-          <div className="post-content-text">{analytics.content}</div>
+          <div className="post-content-wrapper">
+            <div className="post-content-text">
+              {highlightContent(analytics.content)}
+            </div>
+
+            {(analytics.hashtags?.length > 0 || analytics.mentions?.length > 0) && (
+              <div className="post-tags-line">
+                {analytics.mentions.map((mention, i) => (
+                  <span key={i} className="mention">@{mention}</span>
+                ))}
+                {analytics.hashtags.map((tag, i) => (
+                  <span key={i} className="hashtag">#{tag}</span>
+                ))}
+              </div>
+            )}
+          </div>
+
           
           {analytics?.retweeted_post && (
             <div className="retweet-wrapper">
@@ -209,19 +252,6 @@ const handleRepost = async () => {
               <PollShowComponent post={{ ...analytics, poll }} />
             </div>
           )}
-
-          <div className="post-tags">
-            {analytics.hashtags?.map((tag) => (
-              <span key={tag} className="hashtag">
-                #{tag}
-              </span>
-            ))}
-            {analytics.mentions?.map((mention) => (
-              <span key={mention} className="mention">
-                @{mention}
-              </span>
-            ))}
-          </div>
 
           <div className="post-detail-action-bar">
             <div
@@ -294,7 +324,7 @@ const handleRepost = async () => {
             </div>
           </div>
         ))}
-        
+
         {showCommentModal && (
           <CommentModal
             onClose={() => setShowCommentModal(false)}
