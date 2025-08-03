@@ -7,5 +7,10 @@ export const userRequests = {
 export const postRequests = {
     fetcahAllPosts: '/api/posts',
     trendingHashtags: '/api/posts/trending/hashtags',
-    liveFeeds: '/api/posts/live-feeds'
+    liveFeeds: '/api/posts/live-feeds',
+    generalSearch: '/api/search'
+}
+
+export const userSuggestions = {
+    followSuggestions: '/api/users/suggestions'
 }

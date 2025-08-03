@@ -2,7 +2,7 @@ import React from 'react';
 import { useTheme } from '../context/ThemeContext';
 import Sidebar from './Sidebar';
 import RightSidebar from './RightSidebar';
-import './MainLayout.css';
+import '../styles/MainLayout.css';
 
 const MainLayout = ({ children }) => {
   const { theme } = useTheme();

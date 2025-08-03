@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { xcloneApi } from "../constants/axios";
 import { postRequests } from "../constants/requests";
 import MainLayout from "../components/MainLayout";
-import "./HomePage.css";
+import "../styles/HomePage.css";
 import useAppStateContext from "../hooks/useAppStateContext";
 
 const HomePage = () => {
@@ -10,6 +10,11 @@ const HomePage = () => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // Image modal state
+  const [showModal, setShowModal] = useState(false);
+  const [modalImages, setModalImages] = useState([]);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const { appState } = useAppStateContext();
   const firstAlphabet = appState.user?.email?.charAt(0);
@@ -138,6 +143,55 @@ const HomePage = () => {
     );
   };
 
+  // Image modal handlers
+  const handleImageClick = (images, clickedIndex) => {
+    setModalImages(images);
+    setCurrentImageIndex(clickedIndex);
+    setShowModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setModalImages([]);
+    setCurrentImageIndex(0);
+  };
+
+  const handlePrevImage = () => {
+    setCurrentImageIndex((prev) => 
+      prev === 0 ? modalImages.length - 1 : prev - 1
+    );
+  };
+
+  const handleNextImage = () => {
+    setCurrentImageIndex((prev) => 
+      prev === modalImages.length - 1 ? 0 : prev + 1
+    );
+  };
+
+  const handleModalClick = (e) => {
+    if (e.target === e.currentTarget) {
+      handleCloseModal();
+    }
+  };
+
+  // Handle keyboard navigation
+  useEffect(() => {
+    const handleKeyPress = (e) => {
+      if (!showModal) return;
+      
+      if (e.key === 'Escape') {
+        handleCloseModal();
+      } else if (e.key === 'ArrowLeft') {
+        handlePrevImage();
+      } else if (e.key === 'ArrowRight') {
+        handleNextImage();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyPress);
+    return () => document.removeEventListener('keydown', handleKeyPress);
+  }, [showModal, modalImages.length]);
+
   return (
     <MainLayout>
       <div className="feed-header">
@@ -218,6 +272,88 @@ const HomePage = () => {
                 </div>
                 <div className="post-text">{post.text}</div>
 
+                {/* Media Images */}
+                {post.media_urls && post.media_urls.length > 0 && (
+                  <div className="post-media">
+                    {post.media_urls.length === 1 ? (
+                      <div className="single-image">
+                        <img
+                          src={post.media_urls[0]}
+                          alt="Post media"
+                          className="post-image"
+                          onClick={() => handleImageClick(post.media_urls, 0)}
+                          onError={(e) => {
+                            e.target.style.display = 'none';
+                          }}
+                        />
+                      </div>
+                    ) : post.media_urls.length === 2 ? (
+                      <div className="two-images">
+                        {post.media_urls.map((url, index) => (
+                          <img
+                            key={index}
+                            src={url}
+                            alt={`Post media ${index + 1}`}
+                            className="post-image"
+                            onClick={() => handleImageClick(post.media_urls, index)}
+                            onError={(e) => {
+                              e.target.style.display = 'none';
+                            }}
+                          />
+                        ))}
+                      </div>
+                    ) : post.media_urls.length === 3 ? (
+                      <div className="three-images">
+                        <div className="main-image">
+                          <img
+                            src={post.media_urls[0]}
+                            alt="Post media 1"
+                            className="post-image"
+                            onClick={() => handleImageClick(post.media_urls, 0)}
+                            onError={(e) => {
+                              e.target.style.display = 'none';
+                            }}
+                          />
+                        </div>
+                        <div className="side-images">
+                          {post.media_urls.slice(1).map((url, index) => (
+                            <img
+                              key={index + 1}
+                              src={url}
+                              alt={`Post media ${index + 2}`}
+                              className="post-image"
+                              onClick={() => handleImageClick(post.media_urls, index + 1)}
+                              onError={(e) => {
+                                e.target.style.display = 'none';
+                              }}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="four-images">
+                        {post.media_urls.slice(0, 4).map((url, index) => (
+                          <img
+                            key={index}
+                            src={url}
+                            alt={`Post media ${index + 1}`}
+                            className="post-image"
+                            onClick={() => handleImageClick(post.media_urls, index)}
+                            onError={(e) => {
+                              e.target.style.display = 'none';
+                            }}
+                          />
+                        ))}
+                        {post.media_urls.length > 4 && (
+                          <div className="more-images-overlay">
+                            +{post.media_urls.length - 4} more
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 {/* Poll Component */}
                 {post.poll && (
                   <div className="poll-container">
@@ -287,6 +423,39 @@ const HomePage = () => {
           ))
         )}
       </div>
+
+      {/* Image Modal */}
+      {showModal && (
+        <div className="image-modal" onClick={handleModalClick}>
+          <div className="image-modal-content">
+            <button className="image-modal-close" onClick={handleCloseModal}>
+              <i className="fas fa-times"></i>
+            </button>
+            
+            {modalImages.length > 1 && (
+              <>
+                <button className="image-modal-nav image-modal-prev" onClick={handlePrevImage}>
+                  <i className="fas fa-chevron-left"></i>
+                </button>
+                <button className="image-modal-nav image-modal-next" onClick={handleNextImage}>
+                  <i className="fas fa-chevron-right"></i>
+                </button>
+              </>
+            )}
+            
+            <img
+              src={modalImages[currentImageIndex]}
+              alt={`Image ${currentImageIndex + 1}`}
+            />
+            
+            {modalImages.length > 1 && (
+              <div className="image-modal-counter">
+                {currentImageIndex + 1} / {modalImages.length}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </MainLayout>
   );
 };
