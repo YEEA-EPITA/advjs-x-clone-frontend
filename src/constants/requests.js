@@ -1,3 +1,5 @@
+import FollowSuggestions from "../components/FollowSuggestions";
+
 export const userRequests = {
   login: "/api/auth/login",
   logout: "/api/auth/logout",
@@ -26,6 +28,6 @@ export const notificationRequests = {
   fetchAll: "/api/notifications",
 };
 export const userSuggestions = {
-  fetchSuggestions: "/api/users/suggestions",
+  followSuggestions: "/api/users/suggestions",
   followUser: (userId) => `/api/users/${userId}/follow`,
 };

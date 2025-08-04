@@ -44,7 +44,6 @@ const FollowSuggestions = () => {
                 // Get auth token from localStorage
                 const user = localStorage.getItem("user");
                 const token = user ? JSON.parse(user).token : null;
-
                 const response = await xcloneApi.get(userSuggestions.followSuggestions, {
                     headers: {
                         'Authorization': `Bearer ${token}`
@@ -52,7 +51,7 @@ const FollowSuggestions = () => {
                 });
 
                 if (response.data.success) {
-                    setSuggestions(response.data.suggestions || []);
+                    setSuggestions(response.data.body.suggestions || []);
                 } else {
                     setSuggestionsError('Failed to fetch suggestions');
                 }
@@ -92,11 +91,8 @@ const FollowSuggestions = () => {
             ) : suggestions.length > 0 ? (
                 suggestions.slice(0, 3).map((suggestion) => (
                     <div key={suggestion._id} className="suggestion-item">
-                        <div className="suggestion-avatar">
-                            <img
-                                src={suggestion.profilePicture || "https://via.placeholder.com/40"}
-                                alt="User avatar"
-                            />
+                        <div className="compose-avatar">
+                            <div className="avatar-placeholder">{suggestion.username?.charAt(0) || "U"}</div>
                         </div>
                         <div className="suggestion-info">
                             <div className="suggestion-name">
