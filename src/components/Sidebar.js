@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import useAppStateContext from "../hooks/useAppStateContext";
 import { useTheme } from "../context/ThemeContext";
-import "./Sidebar.css";
+import "../styles/Sidebar.css";
 
 const Sidebar = ({ onPostClick }) => {
   const navigate = useNavigate();
@@ -28,6 +28,19 @@ const Sidebar = ({ onPostClick }) => {
     navigate("/auth");
   };
 
+  const navigationItems = [
+    { path: "/home", icon: "fas fa-home", label: "Home" },
+    { path: "/explore", icon: "fas fa-hashtag", label: "Explore" },
+    { path: "/notifications", icon: "fas fa-bell", label: "Notifications" },
+    { path: "/messages", icon: "fas fa-envelope", label: "Messages" },
+    { path: "/profile", icon: "fas fa-user", label: "Profile" },
+    { path: "/more", icon: "fas fa-ellipsis-h", label: "More" },
+  ];
+
+  const handleNavigation = (path) => {
+    navigate(path);
+  };
+
   const isActive = (path) => location.pathname === path;
 
   return (
@@ -36,40 +49,18 @@ const Sidebar = ({ onPostClick }) => {
         <div className="logo-container">
           <img src="/assets/x-logo.png" alt="X" className="sidebar-logo" />
         </div>
-        <div
-          className={`nav-item ${isActive("/home") ? "active" : ""}`}
-          onClick={() => navigate("/home")}
-        >
-          <i className="fas fa-home"></i>
-          <span>Home</span>
-        </div>
-        <div className={`nav-item ${isActive("/explore") ? "active" : ""}`}>
-          <i className="fas fa-hashtag"></i>
-          <span>Explore</span>
-        </div>
-        <div
-          className={`nav-item ${isActive("/notifications") ? "active" : ""}`}
-          onClick={() => navigate("/notifications")}
-        >
-          <i className="fas fa-bell"></i>
-          <span>Notifications</span>
-        </div>
-        <div className="nav-item">
-          <i className="fas fa-envelope"></i>
-          <span>Messages</span>
-        </div>
-        <div className="nav-item">
-          <i className="fas fa-bookmark"></i>
-          <span>Bookmarks</span>
-        </div>
-        <div className={`nav-item ${isActive("/profile") ? "active" : ""}`}>
-          <i className="fas fa-user"></i>
-          <span>Profile</span>
-        </div>
-        <div className="nav-item">
-          <i className="fas fa-ellipsis-h"></i>
-          <span>More</span>
-        </div>
+
+        {navigationItems.map((item) => (
+          <div
+            key={item.path}
+            className={`nav-item ${location.pathname === item.path ? "active" : ""}`}
+            onClick={() => handleNavigation(item.path)}
+          >
+            <i className={item.icon}></i>
+            <span>{item.label}</span>
+          </div>
+        ))}
+        
         <div className="nav-item" onClick={toggleTheme}>
           <i className={`fas ${theme === "dark" ? "fa-sun" : "fa-moon"}`}></i>
           <span>{theme === "dark" ? "Light Mode" : "Dark Mode"}</span>

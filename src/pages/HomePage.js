@@ -3,12 +3,14 @@ import { useNavigate } from "react-router-dom";
 import { xcloneApi } from "../constants/axios";
 import { postRequests } from "../constants/requests";
 import MainLayout from "../components/MainLayout";
-import "./HomePage.css";
+import "../styles/HomePage.css";
 import useAppStateContext from "../hooks/useAppStateContext";
 import PostComposer from "../components/PostComposer";
 import PostComposerInline from "../components/PostComposerInline";
 import PollShowComponent from "../components/PollShowComponent";
 import PostLikeComponent from "../components/PostLikeComponent";
+import ImageModal from "../components/ImageModal"; 
+import SinglePost from "../components/SinglePost";
 
 const HomePage = () => {
   const [loading, setLoading] = useState(true);
@@ -17,6 +19,12 @@ const HomePage = () => {
 
   const { appState, dispatch } = useAppStateContext();
   const navigate = useNavigate();
+  // Image modal state
+  const [showModal, setShowModal] = useState(false);
+  const [modalImages, setModalImages] = useState([]);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  const firstAlphabet = appState.user?.email?.charAt(0);
 
   console.log("AppState:", appState); // Debug log
 
@@ -122,14 +130,58 @@ const HomePage = () => {
     });
   };
 
-  const handlePostClick = (e, postId) => {
-    if (!e?.target) return; 
-    const ignore = e.target.closest(".no-nav");
-    if (!ignore) {
-      navigate(`/posts/${postId}`);
+
+
+  // Image modal handlers
+  const handleImageClick = (images, clickedIndex) => {
+    setModalImages(images);
+    setCurrentImageIndex(clickedIndex);
+    setShowModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setModalImages([]);
+    setCurrentImageIndex(0);
+  };
+
+  const handlePrevImage = () => {
+    setCurrentImageIndex((prev) => 
+      prev === 0 ? modalImages.length - 1 : prev - 1
+    );
+  };
+
+  const handleNextImage = () => {
+    setCurrentImageIndex((prev) => 
+      prev === modalImages.length - 1 ? 0 : prev + 1
+    );
+  };
+
+  const handleModalClick = (e) => {
+    if (e.target === e.currentTarget) {
+      handleCloseModal();
     }
   };
 
+  
+
+  // Handle keyboard navigation
+  useEffect(() => {
+    const handleKeyPress = (e) => {
+      if (!showModal) return;
+      
+      if (e.key === 'Escape') {
+        handleCloseModal();
+      } else if (e.key === 'ArrowLeft') {
+        handlePrevImage();
+      } else if (e.key === 'ArrowRight') {
+        handleNextImage();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyPress);
+    return () => document.removeEventListener('keydown', handleKeyPress);
+  }, [showModal, modalImages.length]);
 
   return (
     <MainLayout
@@ -170,74 +222,27 @@ const HomePage = () => {
           </div>
         ) : (
           posts.map((post) => (
-            <div
-              key={post.id}
-              className="post"
-              onClick={(e) => handlePostClick(e, post.id)}
-              style={{ cursor: "pointer" }} 
-            >
-              <div className="post-content">
-                <div className="post-header">
-                  <span className="post-name">{post.name}</span>
-                  <span className="post-username">@{post.username}</span>
-                  <span className="post-time">· {post.time}</span>
-                  {post.location && (
-                    <span className="post-location">📍 {post.location}</span>
-                  )}
-                </div>
-                <div className="post-text">{post.text}</div>
-  
-                <div className="no-nav">
-                  <PollShowComponent post={post} />
-                </div>
+            <SinglePost
+                post={post}
+                firstAlphabet={post.username?.charAt(0) || "U"}
+                onImageClick={handleImageClick}
+                onRetweet={handleRetweet}
+                />
 
-                {(post.hashtags?.length > 0 || post.mentions?.length > 0) && (
-                  <div className="post-tags">
-                    {post.hashtags?.map((tag) => (
-                      <span key={tag} className="hashtag">
-                        #{tag}
-                      </span>
-                    ))}
-                    {post.mentions?.map((mention) => (
-                      <span key={mention} className="mention">
-                        @{mention}
-                      </span>
-                    ))}
-                  </div>
-                )}
-
-                <div className="post-actions no-nav">
-                    <div className="action-item">
-                      <i className="fas fa-comment"></i>
-                      <span>{post.comments}</span>
-                    </div>
-                    <div
-                      className="action-item"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleRetweet(post.id);
-                      }}
-                    >
-                      <i className="fas fa-retweet"></i>
-                      <span>{post.retweets}</span>
-                    </div>
-                    <div
-                      className="action-item"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <PostLikeComponent className={"action-item"} post={post} />
-                    </div>
-                    <div className="action-item">
-                      <i className="fas fa-share"></i>
-                    </div>
-                  </div>
-                </div>
-        
-            </div>
           ))
         )}
       </div>
-      {isComposerOpen && (
+
+        <ImageModal
+        images={modalImages}
+        isOpen={showModal}
+        currentIndex={currentImageIndex}
+        onClose={handleCloseModal}
+        onNext={handleNextImage}
+        onPrev={handlePrevImage}
+        onBackgroundClick={handleModalClick}
+        />
+        {isComposerOpen && (
         <>
           <div
             className="composer-backdrop"

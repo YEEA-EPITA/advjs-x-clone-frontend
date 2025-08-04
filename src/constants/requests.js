@@ -24,3 +24,7 @@ export const pollRequests = {
 export const notificationRequests = {
   fetchAll: "/api/notifications",
 };
+export const userSuggestions = {
+  fetchSuggestions: "/api/users/suggestions",
+  followUser: (userId) => `/api/users/${userId}/follow`,
+};

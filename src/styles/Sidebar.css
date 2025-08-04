@@ -19,6 +19,13 @@
 .logo-container {
   padding: 12px 16px;
   margin-bottom: 20px;
+  cursor: pointer;
+  border-radius: 25px;
+  transition: background-color 0.2s;
+}
+
+.logo-container:hover {
+  background-color: var(--bg-hover);
 }
 
 .sidebar-logo {
