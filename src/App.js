@@ -18,8 +18,6 @@ const App = () => {
   return (
     <ThemeProvider>
       <Routes>
-        {/* Landing Page */}
-
         {/* Public Routes */}
         <Route element={<PublicRoute />}>
           <Route path="/" element={<LandingPage />} />
@@ -32,7 +30,6 @@ const App = () => {
           <Route path="/notifications" element={<NotificationsPage />} />
           <Route path="/posts/:postId" element={<PostDetailPage />} />
           <Route path="/explore" element={<ExplorePage />} />
-          <Route path="/notifications" element={<NotificationsPage />} />
           <Route path="/messages" element={<MessagesPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/more" element={<MorePage />} />
