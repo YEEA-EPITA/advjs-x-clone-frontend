@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 import { xcloneApi } from "../constants/axios";
 import { postRequests } from "../constants/requests";
 import MainLayout from "../components/MainLayout";
@@ -7,9 +6,7 @@ import "../styles/HomePage.css";
 import useAppStateContext from "../hooks/useAppStateContext";
 import PostComposer from "../components/PostComposer";
 import PostComposerInline from "../components/PostComposerInline";
-import PollShowComponent from "../components/PollShowComponent";
-import PostLikeComponent from "../components/PostLikeComponent";
-import ImageModal from "../components/ImageModal"; 
+import ImageModal from "../components/ImageModal";
 import SinglePost from "../components/SinglePost";
 
 const HomePage = () => {
@@ -18,92 +15,88 @@ const HomePage = () => {
   const [isComposerOpen, setIsComposerOpen] = useState(false);
 
   const { appState, dispatch } = useAppStateContext();
-  const navigate = useNavigate();
   // Image modal state
   const [showModal, setShowModal] = useState(false);
   const [modalImages, setModalImages] = useState([]);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  const firstAlphabet = appState.user?.email?.charAt(0);
-
-  console.log("AppState:", appState); // Debug log
-
   const posts = appState.posts?.list || [];
+  const socket = appState?.socket;
 
-  useEffect(() => {
-    const fetchLiveFeeds = async () => {
-      try {
-        setLoading(true);
+  const fetchLiveFeeds = async () => {
+    try {
+      setLoading(true);
 
-        // Get auth token from localStorage
-        const user = localStorage.getItem("user");
-        const token = user ? JSON.parse(user).token : null;
+      // Get auth token from localStorage
+      const user = localStorage.getItem("user");
+      const token = user ? JSON.parse(user).token : null;
 
-        const response = await xcloneApi.get(postRequests.liveFeeds, {
-          headers: {
-            Authorization: `Bearer ${token}`,
+      const response = await xcloneApi.get(postRequests.liveFeeds, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.data.success) {
+        const responses = response.data.body;
+        dispatch({
+          type: "SET_POSTS",
+          payload: {
+            list: responses.feeds || [],
+            pagination: responses.pagination || {},
           },
         });
+        // Transform API data to match our component structure
+        const transformedPosts = responses.feeds.map((feed) => ({
+          id: feed.id,
+          name: feed.username, // Using username as display name
+          username: feed.username,
+          time: formatTimeAgo(feed.created_at),
+          text: feed.content,
+          comments: feed.comment_count,
+          retweets: feed.retweet_count,
+          like_count: feed.like_count,
+          location: feed.location,
+          hashtags: feed.hashtags,
+          mentions: feed.mentions,
+          poll: feed.poll,
+          media_urls: feed.media_urls,
+          liked_by_me: feed.liked_by_me,
+        }));
 
-        if (response.data.success) {
-          const responses = response.data.body;
-          dispatch({
-            type: "SET_POSTS",
-            payload: {
-              list: responses.feeds || [],
-              pagination: responses.pagination || {},
-            },
-          });
-          // Transform API data to match our component structure
-          const transformedPosts = responses.feeds.map((feed) => ({
-            id: feed.id,
-            name: feed.username, // Using username as display name
-            username: feed.username,
-            time: formatTimeAgo(feed.created_at),
-            text: feed.content,
-            comments: feed.comment_count,
-            retweets: feed.retweet_count,
-            like_count: feed.like_count,
-            location: feed.location,
-            hashtags: feed.hashtags,
-            mentions: feed.mentions,
-            poll: feed.poll,
-            media_urls: feed.media_urls,
-            liked_by_me: feed.liked_by_me,
-          }));
-
-          dispatch({
-            type: "SET_POSTS",
-            payload: {
-              list: transformedPosts,
-              pagination: responses.pagination || {},
-            },
-          });
-        } else {
-          setError("Failed to fetch live feeds");
-        }
-      } catch (err) {
+        dispatch({
+          type: "SET_POSTS",
+          payload: {
+            list: transformedPosts,
+            pagination: responses.pagination || {},
+          },
+        });
+      } else {
         setError("Failed to fetch live feeds");
-      } finally {
-        setLoading(false);
       }
-    };
+    } catch (err) {
+      setError("Failed to fetch live feeds");
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchLiveFeeds();
   }, []);
 
-  // // Socket listener for live feed updates
-  // useEffect(() => {
-  //   if (!socket) return;
+  // Socket listener for live feed updates
+  useEffect(() => {
+    if (!socket) return;
 
-  //   socket.on("new_feed", (data) => {
-  //     console.log("Live feed:", data);
-  //   });
+    socket.on("new_feed", (data) => {
+      fetchLiveFeeds();
+    });
 
-  //   return () => {
-  //     socket.off("new_feed");
-  //   };
-  // }, [socket]);
+    return () => {
+      socket.off("new_feed");
+    };
+  }, [socket]);
 
   const formatTimeAgo = (dateString) => {
     const now = new Date();
@@ -130,8 +123,6 @@ const HomePage = () => {
     });
   };
 
-
-
   // Image modal handlers
   const handleImageClick = (images, clickedIndex) => {
     setModalImages(images);
@@ -146,13 +137,13 @@ const HomePage = () => {
   };
 
   const handlePrevImage = () => {
-    setCurrentImageIndex((prev) => 
+    setCurrentImageIndex((prev) =>
       prev === 0 ? modalImages.length - 1 : prev - 1
     );
   };
 
   const handleNextImage = () => {
-    setCurrentImageIndex((prev) => 
+    setCurrentImageIndex((prev) =>
       prev === modalImages.length - 1 ? 0 : prev + 1
     );
   };
@@ -163,24 +154,22 @@ const HomePage = () => {
     }
   };
 
-  
-
   // Handle keyboard navigation
   useEffect(() => {
     const handleKeyPress = (e) => {
       if (!showModal) return;
-      
-      if (e.key === 'Escape') {
+
+      if (e.key === "Escape") {
         handleCloseModal();
-      } else if (e.key === 'ArrowLeft') {
+      } else if (e.key === "ArrowLeft") {
         handlePrevImage();
-      } else if (e.key === 'ArrowRight') {
+      } else if (e.key === "ArrowRight") {
         handleNextImage();
       }
     };
 
-    document.addEventListener('keydown', handleKeyPress);
-    return () => document.removeEventListener('keydown', handleKeyPress);
+    document.addEventListener("keydown", handleKeyPress);
+    return () => document.removeEventListener("keydown", handleKeyPress);
   }, [showModal, modalImages.length]);
 
   return (
@@ -223,17 +212,16 @@ const HomePage = () => {
         ) : (
           posts.map((post) => (
             <SinglePost
-                post={post}
-                firstAlphabet={post.username?.charAt(0) || "U"}
-                onImageClick={handleImageClick}
-                onRetweet={handleRetweet}
-                />
-
+              post={post}
+              firstAlphabet={post.username?.charAt(0) || "U"}
+              onImageClick={handleImageClick}
+              onRetweet={handleRetweet}
+            />
           ))
         )}
       </div>
 
-        <ImageModal
+      <ImageModal
         images={modalImages}
         isOpen={showModal}
         currentIndex={currentImageIndex}
@@ -241,8 +229,8 @@ const HomePage = () => {
         onNext={handleNextImage}
         onPrev={handlePrevImage}
         onBackgroundClick={handleModalClick}
-        />
-        {isComposerOpen && (
+      />
+      {isComposerOpen && (
         <>
           <div
             className="composer-backdrop"
