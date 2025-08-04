@@ -33,8 +33,9 @@ const PostDetailPage = () => {
   const [retweetSource, setRetweetSource] = useState(null);
   const [showRetweetMenu, setShowRetweetMenu] = useState(false);
   const { theme } = useTheme();
-
+  console.log("123 postid:", postId); // Debug log
   useEffect(() => {
+    console.log("token:", JSON.parse(localStorage.getItem("user"))?.token); // Debug log
     const fetchAnalytics = async () => {
       try {
         const response = await xcloneApi.get(postRequests.postAnalytics(postId));
@@ -108,6 +109,7 @@ const formatTimeAgo = (dateString) => {
   const diffInDays = Math.floor(diffInHours / 24);
   return `${diffInDays}d ago`;
 };
+
 
 const handleRepost = async () => {
   try {

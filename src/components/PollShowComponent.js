@@ -90,7 +90,7 @@ const PollShowComponent = ({ post }) => {
 
   return (
     <>
-      {post.poll && (
+      {post?.poll && (
         <div
           className={`poll-container ${post.poll.voted ? "poll-voted" : ""} ${
             new Date(post.poll.expires_at) < new Date() ? "poll-expired" : ""

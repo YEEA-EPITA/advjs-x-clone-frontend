@@ -1,22 +1,32 @@
 import React from "react";
 import PropTypes from "prop-types";
-import Poll from "./Poll";
+import PollShowComponent from "./PollShowComponent";
 import PostTags from "./PostTags";
 import PostMedia from "./PostMedia";
+import PostLikeComponent from "./PostLikeComponent";
+import {useNavigate} from 'react-router-dom'
+
 
 const SinglePost = ({
   post,
   firstAlphabet = "U",
   onImageClick,
-  onLike,
   onRetweet,
 }) => {
+    const navigate = useNavigate()
+    const handlePostClick = (e, postId) => {
+        if (!e?.target) return; 
+        const ignore = e.target.closest(".no-nav");
+        if (!ignore) {
+            navigate(`/posts/${postId}`);
+        }
+        };
   return (
     <div className="post">
       <div className="compose-avatar">
         <div className="avatar-placeholder">{firstAlphabet}</div>
       </div>
-      <div className="post-content">
+      <div className="post-content" onClick={(e) => handlePostClick(e, post.id)}>
         <div className="post-header">
           <span className="post-name">{post.name}</span>
           <span className="post-username">@{post.username}</span>
@@ -28,7 +38,7 @@ const SinglePost = ({
 
         <div className="post-text">{post.text}</div>
 
-        <Poll poll={post.poll} />
+        <PollShowComponent poll={post} />
 
         <PostTags hashtags={post.hashtags} mentions={post.mentions} />
 
@@ -43,16 +53,9 @@ const SinglePost = ({
             <i className="fas fa-retweet"></i>
             <span>{post.retweets}</span>
           </div>
-          <div
-            className="action-item"
-            onClick={() => onLike(post.id)}
-            style={{
-              color: post.likes > 0 ? "var(--accent-red)" : "inherit",
-            }}
-          >
-            <i className="fas fa-heart"></i>
-            <span>{post.likes}</span>
-          </div>
+
+        <PostLikeComponent className={"action-item"} post={post} />
+
           <div className="action-item">
             <i className="fas fa-share"></i>
           </div>

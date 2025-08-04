@@ -2,6 +2,8 @@ import React from 'react';
 import { useTheme } from '../context/ThemeContext';
 import Sidebar from './Sidebar';
 import RightSidebar from './RightSidebar';
+import MobileHeader from './MobileHeader';
+import MobileNavbar from './MobileNavbar';
 import '../styles/MainLayout.css';
 
 const MainLayout = ({ children, onPostClick, pageTitle = "Home" }) => {

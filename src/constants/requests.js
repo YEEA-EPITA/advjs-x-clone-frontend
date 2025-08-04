@@ -14,6 +14,7 @@ export const postRequests = {
   getPollByPostId: (postId) => `/api/posts/${postId}/polls`, 
   addComment: (postId) => `api/posts/${postId}/comments`,
   retweetPost: (postId) => `api/posts/${postId}/retweet`,
+  generalSearch: "/api/search",
 };
 
 export const pollRequests = {
