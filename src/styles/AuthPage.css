@@ -1,0 +1,179 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: Arial, sans-serif;
+  background-color: #ffffff;
+}
+
+.page-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  min-height: 100vh;
+}
+
+.container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 5rem;
+  
+  padding: 2rem;
+  flex: 1;
+  max-width: 1000px;
+  margin: 0 auto;
+  min-height: 0;
+}
+
+.logo-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.x-logo {
+  width: 300px;
+  height: auto;
+}
+
+.auth-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  max-width: 320px;
+  width: 100%;
+  
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.subtitle {
+  font-size: 1.2rem;
+  margin-bottom: 1.5rem;
+}
+
+.social-button,
+.create-account-btn,
+.signin-btn {
+  width: 100%;
+  padding: 12px;
+  margin: 6px 0;
+  border-radius: 9999px;
+  font-weight: bold;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.social-button {
+  border: 1px solid #ccc;
+  background-color: #fff;
+}
+
+.create-account-btn {
+  background-color: #1da1f2;
+  color: white;
+  border: none;
+}
+
+.signin-btn {
+  border: 1px solid #ccc;
+  background-color: white;
+  color: #1da1f2;
+}
+
+.icon {
+  margin-right: 8px;
+}
+
+.divider-with-text {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  margin: 1rem 0;
+  gap: 8px;
+}
+
+.divider-with-text .line {
+  flex: 1;
+  height: 1px;
+  background-color: #ccc;
+}
+
+.or-text {
+  font-size: 13px;
+  color: #657786;
+}
+
+.tos-text {
+  font-size: 12px;
+  color: #555;
+  margin-top: 16px;
+  text-align: center;
+}
+
+.signin-container {
+  width: 100%;
+}
+
+.footer {
+  background-color: #f7f9f9;
+  padding: 20px 16px;
+  font-size: 13px;
+  color: #536471;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  border-top: 1px solid #e1e8ed;
+  margin-top: auto; 
+}
+
+.footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.footer-links li a {
+  color: inherit;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.footer-links li a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 767px) {
+  .container {
+    flex-direction: column;
+    gap: 2rem;
+    padding: 1.5rem;
+  }
+
+  .x-logo {
+    width: 150px;
+  }
+
+  .logo-section {
+    width: 100%;
+  }
+
+  .auth-section {
+    width: 100%;
+  }
+}

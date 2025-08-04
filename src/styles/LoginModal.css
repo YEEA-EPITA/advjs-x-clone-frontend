@@ -1,0 +1,87 @@
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(91, 112, 131, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: white;
+  width: 90%;
+  max-width: 480px;
+  border-radius: 16px;
+  padding: 40px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.1);
+  position: relative;
+}
+
+.close-button {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  font-size: 20px;
+  background: none;
+  border: none;
+  color: #555;
+  cursor: pointer;
+}
+
+.modal-logo {
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.modal-title {
+  text-align: center;
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 24px;
+}
+
+.modal-input {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 12px;
+  border: 1px solid #ccd6dd;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.modal-password-wrapper {
+  position: relative;
+}
+
+.modal-eye {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #888;
+}
+
+.modal-submit {
+  width: 100%;
+  background-color: #1a91da;
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 9999px;
+  padding: 12px;
+  margin-top: 16px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.modal-message {
+  text-align: center;
+  color: black;
+  font-size: 13px;
+  margin-top: 10px;
+}
