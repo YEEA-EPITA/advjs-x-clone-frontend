@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "../context/ThemeContext";
 import useAppStateContext from "../hooks/useAppStateContext";
-import "./MobileHeader.css";
+import "../styles/MobileHeader.css";
 
 const MobileHeader = ({ title = "Home" }) => {
   const navigate = useNavigate();

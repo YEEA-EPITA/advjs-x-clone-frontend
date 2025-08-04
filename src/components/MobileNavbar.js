@@ -1,6 +1,6 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import useAppStateContext from "../hooks/useAppStateContext";
-import "./MobileNavbar.css";
+import "../styles/MobileNavbar.css";
 
 const MobileNavbar = ({ onPostClick }) => {
   const navigate = useNavigate();

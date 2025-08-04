@@ -1,4 +1,4 @@
-import "./PollShowComponent.css";
+import "../styles/PollShowComponent.css";
 import React, { useEffect, useState } from "react";
 import useAppStateContext from "../hooks/useAppStateContext";
 import { xcloneApi } from "../constants/axios";

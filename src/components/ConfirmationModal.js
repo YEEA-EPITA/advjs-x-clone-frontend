@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import "./ConfirmationModal.css";
+import "../styles/ConfirmationModal.css";
 
 const ConfirmationModal = ({
   isOpen,
