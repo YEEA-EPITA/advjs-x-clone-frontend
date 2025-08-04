@@ -15,7 +15,7 @@ import {
 import { PiSealCheckFill } from "react-icons/pi";
 import PostLikeComponent from "../components/PostLikeComponent";
 import PollShowComponent from "../components/PollShowComponent";
-import "../components/PollShowComponent.css";
+import "../styles/PollShowComponent.css";
 import useAppStateContext from "../hooks/useAppStateContext";
 import CommentModal from "../components/CommentModal"; 
 import PostComposer from "../components/PostComposer";

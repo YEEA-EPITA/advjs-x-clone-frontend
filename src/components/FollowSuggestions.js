@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import PropTypes from "prop-types";
 import { xcloneApi } from '../constants/axios';
 import { userSuggestions } from '../constants/requests';
+import { postRequests } from "../constants/requests";
+import useAppStateContext from "../hooks/useAppStateContext";
+
 
 const FollowSuggestions = () => {
     // Suggestions state
@@ -18,6 +21,9 @@ const FollowSuggestions = () => {
         }
         return count.toString();
     };
+    const { appState } = useAppStateContext();
+    const [optimisticUpdate, setOptimisticUpdate] = useState(null);
+    
 
     const handleFollow = async (userId) => {
         try {
@@ -30,6 +36,22 @@ const FollowSuggestions = () => {
             setSuggestions(prevSuggestions =>
                 prevSuggestions.filter(suggestion => suggestion._id !== userId)
             );
+
+            try {
+                const response = await xcloneApi.post(
+                    userSuggestions.followUser(userId),
+                    {},
+                    {
+                        headers: {
+                            Authorization: `Bearer ${appState.user.token}`,
+                        },
+                    }
+                );
+
+                // Don't dispatch local update - wait for socket to reconcile
+            } catch (error) {
+                setOptimisticUpdate(null);
+            }
         } catch (err) {
             console.error('Error following user:', err);
         }
