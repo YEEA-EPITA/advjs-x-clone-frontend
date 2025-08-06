@@ -101,7 +101,7 @@ const SinglePost = ({
         </div>
 
         <div className="post-text" onClick={(e) => handlePostClick(e, post.id)}>
-          {post.text}
+          {post.text || post.content}
         </div>
 
         <PollShowComponent post={post} />
