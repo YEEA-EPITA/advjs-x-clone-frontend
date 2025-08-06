@@ -8,6 +8,7 @@ import ConfirmationModal from "./ConfirmationModal";
 import { useNavigate } from "react-router-dom";
 
 const SinglePost = ({
+  postId,
   post,
   firstAlphabet = "U",
   onImageClick,

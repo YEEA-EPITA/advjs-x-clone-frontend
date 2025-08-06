@@ -214,6 +214,7 @@ const ExplorePage = () => {
                                             <h3>Posts</h3>
                                             {searchResults.posts.map(post => (
                                                 <SinglePost
+                                                    key={post.id}
                                                     post={post}
                                                     firstAlphabet={post.username?.charAt(0) || "U"}
                                                     onImageClick={handleImageClick}

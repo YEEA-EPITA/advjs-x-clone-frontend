@@ -87,7 +87,7 @@ const FollowSuggestions = () => {
 
         fetchSuggestions();
     }, []);
-    console.log("Suggestions:", suggestions);
+    // console.log("Suggestions:", suggestions);
     return (
         <div className="suggestions-widget">
             <h3>Who to follow</h3>
