@@ -32,7 +32,6 @@ const Sidebar = ({ onPostClick }) => {
     { path: "/home", icon: "fas fa-home", label: "Home" },
     { path: "/explore", icon: "fas fa-hashtag", label: "Explore" },
     { path: "/notifications", icon: "fas fa-bell", label: "Notifications" },
-    { path: "/messages", icon: "fas fa-envelope", label: "Messages" },
     { path: "/profile", icon: "fas fa-user", label: "Profile" },
     { path: "/more", icon: "fas fa-ellipsis-h", label: "More" },
   ];

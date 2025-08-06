@@ -212,6 +212,7 @@ const HomePage = () => {
         ) : (
           posts.map((post) => (
             <SinglePost
+                key={post.id}
               post={post}
               firstAlphabet={post.username?.charAt(0) || "U"}
               onImageClick={handleImageClick}

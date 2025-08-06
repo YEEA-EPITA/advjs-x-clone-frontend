@@ -8,6 +8,7 @@ import ConfirmationModal from "./ConfirmationModal";
 import { useNavigate } from "react-router-dom";
 
 const SinglePost = ({
+  postId,
   post,
   firstAlphabet = "U",
   onImageClick,
@@ -100,10 +101,10 @@ const SinglePost = ({
         </div>
 
         <div className="post-text" onClick={(e) => handlePostClick(e, post.id)}>
-          {post.text}
+          {post.text || post.content}
         </div>
 
-        <PollShowComponent poll={post} />
+        <PollShowComponent post={post} />
 
         <PostTags hashtags={post.hashtags} mentions={post.mentions} />
 

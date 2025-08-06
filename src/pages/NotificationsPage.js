@@ -15,24 +15,18 @@ import { notificationRequests } from "../constants/requests";
 import { xcloneApi } from "../constants/axios";
 import { useTheme } from "../context/ThemeContext"; 
 
-const typeIconMap = {
-  mention: faAt,
-  like: faHeart,
-  comment: faComment,
-  retweet: faRetweet,
-  follow: faUserPlus,
-};
 
 const NotificationsPage = () => {
   const [notifications, setNotifications] = useState([]);
   const [activeTab, setActiveTab] = useState("all");
-  const { theme } = useTheme(); 
+//   const { theme } = useTheme(); 
 
   useEffect(() => {
     const loadNotifications = async () => {
       try {
         const res = await xcloneApi.get(notificationRequests.fetchAll);
-        setNotifications(res.data);
+        console.log("Notifications fetched:", res.data);
+        setNotifications(res.data.body);
       } catch (err) {
         console.error("Failed to load notifications", err);
       }
@@ -45,7 +39,6 @@ const NotificationsPage = () => {
     activeTab === "mentions" ? n.type === "mention" : true
   );
 
-  const isDarkMode = theme === "dark"; 
 
   const getIconByNotification = (notification) => {
     const { type, message } = notification;

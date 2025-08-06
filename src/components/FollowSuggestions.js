@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import PropTypes from "prop-types";
 import { xcloneApi } from '../constants/axios';
 import { userSuggestions } from '../constants/requests';
+import { postRequests } from "../constants/requests";
+import useAppStateContext from "../hooks/useAppStateContext";
+
 
 const FollowSuggestions = () => {
     // Suggestions state
@@ -18,6 +21,9 @@ const FollowSuggestions = () => {
         }
         return count.toString();
     };
+    const { appState } = useAppStateContext();
+    const [optimisticUpdate, setOptimisticUpdate] = useState(null);
+    
 
     const handleFollow = async (userId) => {
         try {
@@ -30,6 +36,22 @@ const FollowSuggestions = () => {
             setSuggestions(prevSuggestions =>
                 prevSuggestions.filter(suggestion => suggestion._id !== userId)
             );
+
+            try {
+                const response = await xcloneApi.post(
+                    userSuggestions.followUser(userId),
+                    {},
+                    {
+                        headers: {
+                            Authorization: `Bearer ${appState.user.token}`,
+                        },
+                    }
+                );
+
+                // Don't dispatch local update - wait for socket to reconcile
+            } catch (error) {
+                setOptimisticUpdate(null);
+            }
         } catch (err) {
             console.error('Error following user:', err);
         }
@@ -44,7 +66,6 @@ const FollowSuggestions = () => {
                 // Get auth token from localStorage
                 const user = localStorage.getItem("user");
                 const token = user ? JSON.parse(user).token : null;
-
                 const response = await xcloneApi.get(userSuggestions.followSuggestions, {
                     headers: {
                         'Authorization': `Bearer ${token}`
@@ -52,7 +73,7 @@ const FollowSuggestions = () => {
                 });
 
                 if (response.data.success) {
-                    setSuggestions(response.data.suggestions || []);
+                    setSuggestions(response.data.body.suggestions || []);
                 } else {
                     setSuggestionsError('Failed to fetch suggestions');
                 }
@@ -66,7 +87,7 @@ const FollowSuggestions = () => {
 
         fetchSuggestions();
     }, []);
-    console.log("Suggestions:", suggestions);
+    // console.log("Suggestions:", suggestions);
     return (
         <div className="suggestions-widget">
             <h3>Who to follow</h3>
@@ -92,11 +113,8 @@ const FollowSuggestions = () => {
             ) : suggestions.length > 0 ? (
                 suggestions.slice(0, 3).map((suggestion) => (
                     <div key={suggestion._id} className="suggestion-item">
-                        <div className="suggestion-avatar">
-                            <img
-                                src={suggestion.profilePicture || "https://via.placeholder.com/40"}
-                                alt="User avatar"
-                            />
+                        <div className="compose-avatar">
+                            <div className="avatar-placeholder">{suggestion.username?.charAt(0) || "U"}</div>
                         </div>
                         <div className="suggestion-info">
                             <div className="suggestion-name">

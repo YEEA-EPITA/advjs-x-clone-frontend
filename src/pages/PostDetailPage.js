@@ -15,7 +15,7 @@ import {
 import { PiSealCheckFill } from "react-icons/pi";
 import PostLikeComponent from "../components/PostLikeComponent";
 import PollShowComponent from "../components/PollShowComponent";
-import "../components/PollShowComponent.css";
+import "../styles/PollShowComponent.css";
 import useAppStateContext from "../hooks/useAppStateContext";
 import CommentModal from "../components/CommentModal"; 
 import PostComposer from "../components/PostComposer";
@@ -33,7 +33,7 @@ const PostDetailPage = () => {
   const [retweetSource, setRetweetSource] = useState(null);
   const [showRetweetMenu, setShowRetweetMenu] = useState(false);
   const { theme } = useTheme();
-  console.log("123 postid:", postId); // Debug log
+  // console.log("123 postid:", postId); // Debug log
   useEffect(() => {
     console.log("token:", JSON.parse(localStorage.getItem("user"))?.token); // Debug log
     const fetchAnalytics = async () => {
