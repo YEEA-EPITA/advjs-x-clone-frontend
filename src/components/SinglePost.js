@@ -104,7 +104,7 @@ const SinglePost = ({
           {post.text}
         </div>
 
-        <PollShowComponent poll={post} />
+        <PollShowComponent post={post} />
 
         <PostTags hashtags={post.hashtags} mentions={post.mentions} />
 
