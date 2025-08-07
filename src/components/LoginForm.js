@@ -37,16 +37,17 @@ const LoginForm = () => {
   const onSubmit = async ({ email, password }) => {
     try {
       const res = await xcloneApi.post(userRequests.login, { email, password });
-      
+
       // Store the complete user data with token
       const userData = {
-        token: res.data.token || res.data.body?.token, // Handle different response structures
+        token: res.data.body?.token, // Handle different response structures
         email,
-        username: res.data.username || res.data.body?.username,
-        userId: res.data.userId || res.data.body?.userId,
-        isAuthenticated: true
+        username: res.data.body?.user?.username,
+        userId: res.data.body.user?.id,
+        name: res.data.body.user?.displayName,
+        isAuthenticated: true,
       };
-      
+
       // Store in localStorage directly
       localStorage.setItem("user", JSON.stringify(userData));
 
@@ -58,7 +59,7 @@ const LoginForm = () => {
         payload: userData,
       });
 
-      localStorage.setItem('token', token);
+      localStorage.setItem("token", token);
       navigate("/home");
     } catch (err) {
       setMessage(err.response?.data?.message || "Login failed");
@@ -86,7 +87,9 @@ const LoginForm = () => {
           <FontAwesomeIcon icon={showPass ? faEye : faEyeSlash} />
         </span>
       </div>
-      {errors.password && <p className="modal-message">{errors.password.message}</p>}
+      {errors.password && (
+        <p className="modal-message">{errors.password.message}</p>
+      )}
 
       {message && <p className="modal-message">{message}</p>}
 
