@@ -12,7 +12,6 @@ import useAppStateContext from "../hooks/useAppStateContext";
 
 const SinglePost = ({ post, firstAlphabet = "U", onImageClick, onRetweet }) => {
   const navigate = useNavigate();
-  const [showDeleteMenu, setShowDeleteMenu] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
   const { appState, dispatch } = useAppStateContext();
@@ -27,23 +26,6 @@ const SinglePost = ({ post, firstAlphabet = "U", onImageClick, onRetweet }) => {
   const user = JSON.parse(localStorage.getItem("user")) || {};
   const [loading, setLoading] = useState(false);
 
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
-        setShowDeleteMenu(false);
-      }
-    };
-
-    if (showDeleteMenu) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [showDeleteMenu]);
-
   const handlePostClick = (e, postId) => {
     if (!e?.target) return;
     const ignore = e.target.closest(".no-nav");
@@ -54,7 +36,6 @@ const SinglePost = ({ post, firstAlphabet = "U", onImageClick, onRetweet }) => {
 
   const handleDeleteClick = (e) => {
     // e.stopPropagation();
-    // setShowDeleteMenu(false);
     setShowDeleteConfirm(true);
   };
 
@@ -96,11 +77,6 @@ const SinglePost = ({ post, firstAlphabet = "U", onImageClick, onRetweet }) => {
     setShowAlert(false);
   };
 
-  const toggleDeleteMenu = (e) => {
-    e.stopPropagation();
-    setShowDeleteMenu(!showDeleteMenu);
-  };
-
   // socket event listener for post deletion
   useEffect(() => {
     if (!socket || !post?.id) return;
@@ -121,7 +97,7 @@ const SinglePost = ({ post, firstAlphabet = "U", onImageClick, onRetweet }) => {
   }, [socket, post?.id]);
 
   // Check if current user can delete this post (either own post or admin)
-  const canDelete = true;
+  const canDelete = post.userId === user.userId;
   return (
     <div className="post">
       <div className="compose-avatar">
@@ -139,19 +115,14 @@ const SinglePost = ({ post, firstAlphabet = "U", onImageClick, onRetweet }) => {
             <div className="post-menu no-nav" ref={menuRef}>
               <button
                 className="post-menu-btn"
-                onClick={toggleDeleteMenu}
+                onClick={handleDeleteClick}
                 title="More options"
               >
-                <i className="fas fa-ellipsis-h"></i>
+                <i
+                  className="fas fa-trash"
+                  style={{ color: "rgb(231 76 60 / 76%)" }}
+                ></i>
               </button>
-              {showDeleteMenu && (
-                <div className="post-menu-dropdown">
-                  <button className="delete-btn" onClick={handleDeleteClick}>
-                    <i className="fas fa-trash"></i>
-                    Delete
-                  </button>
-                </div>
-              )}
             </div>
           )}
         </div>
