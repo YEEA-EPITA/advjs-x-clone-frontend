@@ -1,0 +1,137 @@
+/* Alert Modal Styles */
+.alert-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+  backdrop-filter: blur(2px);
+}
+
+.alert-modal {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  max-width: 400px;
+  width: 90%;
+  max-height: 80vh;
+  overflow: hidden;
+  animation: alertSlideIn 0.3s ease-out;
+}
+
+@keyframes alertSlideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.alert-modal-header {
+  padding: 20px 20px 10px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.alert-icon {
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.alert-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+.alert-modal-body {
+  padding: 0 20px 20px 20px;
+}
+
+.alert-message {
+  margin: 0;
+  color: #666;
+  font-size: 14px;
+  line-height: 1.4;
+  margin-left: 36px; /* Align with title */
+}
+
+.alert-modal-footer {
+  padding: 0 20px 20px 20px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.alert-btn {
+  padding: 8px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  min-width: 60px;
+}
+
+.alert-btn-primary {
+  background-color: var(--accent-blue, #1da1f2);
+  color: white;
+}
+
+.alert-btn-primary:hover {
+  background-color: var(--accent-blue-hover, #1991da);
+  transform: translateY(-1px);
+}
+
+.alert-btn:active {
+  transform: translateY(0);
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .alert-modal {
+    background: #1a1a1a;
+    color: white;
+  }
+
+  .alert-title {
+    color: white;
+  }
+
+  .alert-message {
+    color: #ccc;
+  }
+}
+
+/* Mobile responsiveness */
+@media (max-width: 480px) {
+  .alert-modal {
+    margin: 20px;
+    max-width: none;
+    width: calc(100% - 40px);
+  }
+
+  .alert-modal-header,
+  .alert-modal-body,
+  .alert-modal-footer {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .alert-message {
+    margin-left: 32px;
+  }
+}
