@@ -122,9 +122,6 @@ const SinglePost = ({
 
           <PostLikeComponent className={"action-item"} post={post} />
 
-          <div className="action-item">
-            <i className="fas fa-share"></i>
-          </div>
         </div>
       </div>
 
