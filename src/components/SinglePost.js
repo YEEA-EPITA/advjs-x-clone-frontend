@@ -5,37 +5,26 @@ import PostTags from "./PostTags";
 import PostMedia from "./PostMedia";
 import PostLikeComponent from "./PostLikeComponent";
 import ConfirmationModal from "./ConfirmationModal";
+import AlertModal from "./AlertModal";
 import { useNavigate } from "react-router-dom";
+import { xcloneApi } from "../constants/axios";
+import useAppStateContext from "../hooks/useAppStateContext";
 
-const SinglePost = ({
-  postId,
-  post,
-  firstAlphabet = "U",
-  onImageClick,
-  onRetweet,
-  onDelete,
-}) => {
+const SinglePost = ({ post, firstAlphabet = "U", onImageClick, onRetweet }) => {
   const navigate = useNavigate();
-  const [showDeleteMenu, setShowDeleteMenu] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
+  const { appState, dispatch } = useAppStateContext();
+  const socket = appState.socket;
+  const [alertConfig, setAlertConfig] = useState({
+    title: "",
+    message: "",
+    type: "error",
+  });
   const menuRef = useRef(null);
 
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
-        setShowDeleteMenu(false);
-      }
-    };
-
-    if (showDeleteMenu) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [showDeleteMenu]);
+  const user = JSON.parse(localStorage.getItem("user")) || {};
+  const [loading, setLoading] = useState(false);
 
   const handlePostClick = (e, postId) => {
     if (!e?.target) return;
@@ -46,26 +35,69 @@ const SinglePost = ({
   };
 
   const handleDeleteClick = (e) => {
-    e.stopPropagation();
-    setShowDeleteMenu(false);
+    // e.stopPropagation();
     setShowDeleteConfirm(true);
   };
 
-  const handleConfirmDelete = () => {
-    onDelete(post.id);
+  const handleConfirmDelete = async () => {
+    setLoading(true);
+    try {
+      await xcloneApi.delete(`/api/posts/${post.id}`, {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      });
+      // Only close the confirmation modal after successful deletion
+      setShowDeleteConfirm(false);
+      setAlertConfig({
+        title: "Success",
+        message: "Post deleted successfully!",
+        type: "success",
+      });
+      setShowAlert(true);
+    } catch (error) {
+      // Keep the confirmation modal open on error
+      setAlertConfig({
+        title: "Error",
+        message: error.response?.data?.message || "Failed to delete post",
+        type: "error",
+      });
+      setShowAlert(true);
+    }
+    setLoading(false);
   };
 
   const handleCancelDelete = () => {
+    // Don't allow canceling while deletion is in progress
+    if (loading) return;
     setShowDeleteConfirm(false);
   };
 
-  const toggleDeleteMenu = (e) => {
-    e.stopPropagation();
-    setShowDeleteMenu(!showDeleteMenu);
+  const handleCloseAlert = () => {
+    setShowAlert(false);
   };
 
+  // socket event listener for post deletion
+  useEffect(() => {
+    if (!socket || !post?.id) return;
+
+    const updatePostsList = (updatedPost) => {
+      if (updatedPost.postId !== post.id) return;
+      dispatch({
+        type: "SET_POSTS",
+        payload: {
+          list: appState.posts.list.filter((p) => p.id !== post.id),
+          pagination: appState.posts.pagination,
+        },
+      });
+    };
+
+    socket.on("postDeleted", updatePostsList);
+    return () => socket.off("postDeleted", updatePostsList);
+  }, [socket, post?.id]);
+
   // Check if current user can delete this post (either own post or admin)
-  const canDelete = true;
+  const canDelete = post.userId === user.userId;
   return (
     <div className="post">
       <div className="compose-avatar">
@@ -83,19 +115,14 @@ const SinglePost = ({
             <div className="post-menu no-nav" ref={menuRef}>
               <button
                 className="post-menu-btn"
-                onClick={toggleDeleteMenu}
+                onClick={handleDeleteClick}
                 title="More options"
               >
-                <i className="fas fa-ellipsis-h"></i>
+                <i
+                  className="fas fa-trash"
+                  style={{ color: "rgb(231 76 60 / 76%)" }}
+                ></i>
               </button>
-              {showDeleteMenu && (
-                <div className="post-menu-dropdown">
-                  <button className="delete-btn" onClick={handleDeleteClick}>
-                    <i className="fas fa-trash"></i>
-                    Delete post
-                  </button>
-                </div>
-              )}
             </div>
           )}
         </div>
@@ -132,9 +159,20 @@ const SinglePost = ({
         onConfirm={handleConfirmDelete}
         title="Delete Post?"
         message="This can't be undone and it will be removed from your profile, the timeline of any accounts that follow you, and from search results."
-        confirmText="Delete"
+        confirmText={loading ? "Deleting..." : "Delete"}
         cancelText="Cancel"
         type="danger"
+        loading={loading}
+        disableCancel={loading}
+      />
+
+      {/* Custom Alert Modal */}
+      <AlertModal
+        isOpen={showAlert}
+        onClose={handleCloseAlert}
+        title={alertConfig.title}
+        message={alertConfig.message}
+        type={alertConfig.type}
       />
     </div>
   );

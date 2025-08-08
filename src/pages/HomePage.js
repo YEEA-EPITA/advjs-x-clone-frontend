@@ -50,6 +50,7 @@ const HomePage = () => {
         const transformedPosts = responses.feeds.map((feed) => ({
           id: feed.id,
           name: feed.username, // Using username as display name
+          userId: feed.user_id,
           username: feed.username,
           time: formatTimeAgo(feed.created_at),
           text: feed.content,
@@ -212,7 +213,7 @@ const HomePage = () => {
         ) : (
           posts.map((post) => (
             <SinglePost
-                key={post.id}
+              key={post.id}
               post={post}
               firstAlphabet={post.username?.charAt(0) || "U"}
               onImageClick={handleImageClick}

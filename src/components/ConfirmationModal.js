@@ -11,17 +11,29 @@ const ConfirmationModal = ({
   confirmText = "Confirm",
   cancelText = "Cancel",
   type = "danger", // danger, warning, info
+  loading = false,
+  disableCancel = false,
 }) => {
   if (!isOpen) return null;
 
   const handleBackdropClick = (e) => {
+    // Don't close on backdrop click if loading
+    if (loading) return;
     if (e.target === e.currentTarget) {
       onClose();
     }
   };
 
   const handleConfirm = () => {
+    // Don't allow multiple confirms while loading
+    if (loading) return;
     onConfirm();
+    // Don't close immediately - let the parent handle closing
+  };
+
+  const handleCancel = () => {
+    // Don't allow cancel if disabled or loading
+    if (disableCancel || loading) return;
     onClose();
   };
 
@@ -46,13 +58,32 @@ const ConfirmationModal = ({
         </div>
 
         <div className="confirmation-modal-footer">
-          <button className="confirmation-btn cancel-btn" onClick={onClose}>
+          <button
+            className="confirmation-btn cancel-btn"
+            onClick={handleCancel}
+            disabled={disableCancel || loading}
+            style={{
+              opacity: disableCancel || loading ? 0.5 : 1,
+              cursor: disableCancel || loading ? "not-allowed" : "pointer",
+            }}
+          >
             {cancelText}
           </button>
           <button
             className={`confirmation-btn confirm-btn ${type}`}
             onClick={handleConfirm}
+            disabled={loading}
+            style={{
+              opacity: loading ? 0.7 : 1,
+              cursor: loading ? "not-allowed" : "pointer",
+            }}
           >
+            {loading && (
+              <i
+                className="fas fa-spinner fa-spin"
+                style={{ marginRight: "8px" }}
+              ></i>
+            )}
             {confirmText}
           </button>
         </div>
@@ -70,6 +101,8 @@ ConfirmationModal.propTypes = {
   confirmText: PropTypes.string,
   cancelText: PropTypes.string,
   type: PropTypes.oneOf(["danger", "warning", "info"]),
+  loading: PropTypes.bool,
+  disableCancel: PropTypes.bool,
 };
 
 export default ConfirmationModal;
