@@ -1,9 +1,7 @@
-import React, { useState, useRef } from "react";
-import { useDispatch } from "react-redux";
+import React, { useState, useRef, useEffect } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { createPost } from "../store/postSlice";
 import LoaderBar from "./LoaderBar";
 import {
   faGlobe,
@@ -15,6 +13,10 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import "../styles/PostComposer.css";
+import useAppStateContext from "../hooks/useAppStateContext";
+import { xcloneApi } from "../constants/axios";
+import { postRequests } from "../constants/requests";
+import { transformedPosts } from "../utils/generalFunctions";
 
 const schema = yup.object().shape({
   poll: yup.object().shape({
@@ -49,6 +51,9 @@ const PostComposerInline = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [isPosting, setIsPosting] = useState(false);
   const [isFetchingLocation, setIsFetchingLocation] = useState(false);
+  const { appState, dispatch } = useAppStateContext();
+
+  const socket = appState?.socket;
 
   const [showPoll, setShowPoll] = useState(false);
   const [pollDuration, setPollDuration] = useState({
@@ -78,7 +83,6 @@ const PostComposerInline = () => {
     name: "poll.options",
   });
 
-  const dispatch = useDispatch();
   const fileInputRef = useRef(null);
   const audienceOptions = ["Everyone", "Followers", "Only Me"];
 
@@ -127,7 +131,7 @@ const PostComposerInline = () => {
     );
   };
 
-  const onSubmit = async (formData) => {
+  const onSubmit = async (payload) => {
     if (!content.trim()) return;
 
     setIsPosting(true);
@@ -135,8 +139,8 @@ const PostComposerInline = () => {
     try {
       let pollPayload;
       if (showPoll) {
-        const options = formData.poll.options.filter((opt) => opt.trim());
-        if (formData.poll.question.trim() && options.length >= 2) {
+        const options = payload.poll.options.filter((opt) => opt.trim());
+        if (payload.poll.question.trim() && options.length >= 2) {
           const expires = new Date();
           expires.setDate(expires.getDate() + Number(pollDuration.days || 0));
           expires.setHours(
@@ -146,7 +150,7 @@ const PostComposerInline = () => {
             expires.getMinutes() + Number(pollDuration.minutes || 0)
           );
           pollPayload = {
-            question: formData.poll.question.trim(),
+            question: payload.poll.question.trim(),
             options,
             expires_at: expires.toISOString(),
           };
@@ -154,17 +158,19 @@ const PostComposerInline = () => {
       }
 
       const { hashtags, mentions } = extractTags(content || "");
+      const location = locationName || "Unknown";
+      const poll = pollPayload || null;
 
-      await dispatch(
-        createPost({
-          content,
-          mediaFile,
-          location: locationName || "Unknown",
-          poll: pollPayload,
-          hashtags,
-          mentions,
-        })
-      );
+      const formData = new FormData();
+      formData.append("content", content);
+      if (mediaFile) formData.append("media", mediaFile);
+      formData.append("location", location);
+      if (poll) formData.append("poll", JSON.stringify(poll));
+      if (hashtags?.length)
+        formData.append("hashtags", JSON.stringify(hashtags));
+      if (mentions?.length)
+        formData.append("mentions", JSON.stringify(mentions));
+      const res = await xcloneApi.post(postRequests.createPost, formData);
 
       setContent("");
       setMediaFile(null);
@@ -176,6 +182,23 @@ const PostComposerInline = () => {
       setIsPosting(false);
     }
   };
+
+  useEffect(() => {
+    if (!socket) return;
+
+    socket?.on("new_feed", (data) => {
+      if (!data) return;
+
+      dispatch({
+        type: "UPDATE_POST_LIST_AFTER_CREATE",
+        payload: transformedPosts(data),
+      });
+    });
+
+    return () => {
+      socket?.off("new_feed");
+    };
+  }, [socket]);
 
   return (
     <div className="composer-inline">
