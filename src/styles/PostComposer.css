@@ -38,7 +38,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-top: 40px; 
+  margin-top: 40px;
   margin-bottom: 10px;
 }
 
@@ -60,13 +60,13 @@
 }
 
 .audience-toggle {
-  background-color: transparent;      
-  border: 1px solid #d9d9d9;           
-  border-radius: 9999px;               
+  background-color: transparent;
+  border: 1px solid #d9d9d9;
+  border-radius: 9999px;
   padding: 6px 14px;
   font-size: 14px;
   cursor: pointer;
-  color: #1d9bf0;                     
+  color: #1d9bf0;
   font-weight: 500;
   display: flex;
   align-items: center;
@@ -74,11 +74,11 @@
 }
 
 .audience-dropdown {
-    list-style: none;    
+  list-style: none;
   position: absolute;
   top: 30px;
   left: 0;
-  z-index: 1000; 
+  z-index: 1000;
   background: white;
   border: 1px solid #ccc;
   border-radius: 8px;
@@ -143,6 +143,25 @@
   font-weight: bold;
   font-size: 16px;
   cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.submit-btn:hover:not(:disabled) {
+  background-color: #1a8cd8;
+  transform: translateY(-1px);
+}
+
+.submit-btn:disabled {
+  background-color: #8b8b8b;
+  color: #d1d1d1;
+  cursor: not-allowed;
+  opacity: 0.6;
+  transform: none;
+}
+
+.submit-btn:disabled:hover {
+  background-color: #8b8b8b;
+  transform: none;
 }
 
 .location-display {
@@ -158,13 +177,13 @@
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: rgba(0, 0, 0, 0.3); 
+  background-color: rgba(0, 0, 0, 0.3);
   z-index: 2000;
   display: flex;
   justify-content: center;
   /* overflow: auto;  */
   align-items: center;
-  overflow-y: auto; 
+  overflow-y: auto;
 }
 
 .composer-inline {
@@ -280,12 +299,13 @@
 
 .error-text {
   font-size: 12px;
-  color: #e36e63; .error-text {
-  font-size: 12px;
   color: #e36e63;
-  margin-top: 4px;
-  margin-left: 4px;
-}
+  .error-text {
+    font-size: 12px;
+    color: #e36e63;
+    margin-top: 4px;
+    margin-left: 4px;
+  }
 
   margin-top: 4px;
   margin-left: 4px;
@@ -345,6 +365,21 @@ body.dark .reply-status {
 body.dark .submit-btn {
   background-color: #1da1f2;
   color: white;
+}
+
+body.dark .submit-btn:hover:not(:disabled) {
+  background-color: #1a8cd8;
+}
+
+body.dark .submit-btn:disabled {
+  background-color: #4a4a4a;
+  color: #888;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+body.dark .submit-btn:disabled:hover {
+  background-color: #4a4a4a;
 }
 
 body.dark .composer-overlay {
