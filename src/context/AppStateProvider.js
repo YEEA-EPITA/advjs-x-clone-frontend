@@ -19,6 +19,10 @@ const INITIAL_STATE = {
     typeof window !== "undefined"
       ? JSON.parse(localStorage.getItem("pollVotes")) || {}
       : {},
+  posts: {
+    list: [],
+    pagination: {},
+  },
 };
 
 export const AppStateContext = createContext(INITIAL_STATE);

@@ -31,6 +31,16 @@ const AppStateReducer = (state, action) => {
         },
       };
 
+    case "UPDATE_POST_LIST_AFTER_CREATE":
+      return {
+        ...state,
+
+        posts: {
+          ...state.posts,
+          list: [action.payload, ...state.posts.list],
+        },
+      };
+
     case "UPDATE_POLL_AFTER_VOTE":
       return {
         ...state,
