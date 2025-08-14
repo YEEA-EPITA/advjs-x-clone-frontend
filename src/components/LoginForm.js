@@ -58,8 +58,6 @@ const LoginForm = () => {
         type: "Login",
         payload: userData,
       });
-
-      localStorage.setItem("token", token);
       navigate("/home");
     } catch (err) {
       setMessage(err.response?.data?.message || "Login failed");

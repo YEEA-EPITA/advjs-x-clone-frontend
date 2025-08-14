@@ -9,6 +9,7 @@ const AppStateReducer = (state, action) => {
 
     case "Logout":
       localStorage.removeItem("user");
+      localStorage.removeItem("pollVotes");
       return {
         ...state,
         isAuthenticated: false,
