@@ -6,15 +6,24 @@ import PostMedia from "./PostMedia";
 import PostLikeComponent from "./PostLikeComponent";
 import ConfirmationModal from "./ConfirmationModal";
 import AlertModal from "./AlertModal";
-import { useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { xcloneApi } from "../constants/axios";
 import useAppStateContext from "../hooks/useAppStateContext";
+import { postRequests } from "../constants/requests";
+import { FaRetweet, FaQuoteRight } from "react-icons/fa";
+import PostComposer from "./PostComposer";
 
 const SinglePost = ({ post, firstAlphabet = "U", onImageClick, onRetweet }) => {
+
   const navigate = useNavigate();
+    const [analytics, setAnalytics] = useState(null);
+    const [showComposer, setShowComposer] = useState(false);
+    const [retweetSource, setRetweetSource] = useState(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
   const { appState, dispatch } = useAppStateContext();
+  const [showRetweetMenu, setShowRetweetMenu] = useState(false);
+
   const socket = appState.socket;
   const [alertConfig, setAlertConfig] = useState({
     title: "",
@@ -77,9 +86,52 @@ const SinglePost = ({ post, firstAlphabet = "U", onImageClick, onRetweet }) => {
     setShowAlert(false);
   };
 
+  const handleRepost = async () => {
+    try {
+      const token = JSON.parse(localStorage.getItem("user"))?.token;
+  
+      const response = await xcloneApi.post(
+        postRequests.retweetPost(post.id),
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+  
+      if (response.data.success) {
+        const { retweetCount, isRetweeted } = response.data;
+  
+        setAnalytics((prev) => ({
+          ...prev,
+          retweet_count: retweetCount ?? prev.retweet_count,
+          isRetweeted: isRetweeted,
+        }));
+      }
+  
+      setShowRetweetMenu(false);
+    } catch (error) {
+      console.error("Repost failed:", error);
+    }
+  };
+
   // socket event listener for post deletion
   useEffect(() => {
+
+
     if (!socket || !post?.id) return;
+
+    const fetchAnalytics = async () => {
+      try {
+        const response = await xcloneApi.get(postRequests.postAnalytics(post.id));
+        if (response.data.success) {
+          setAnalytics(response.data.analytics);
+        }
+      } catch (error) {
+        console.error("Error fetching post analytics", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
     const updatePostsList = (updatedPost) => {
       if (updatedPost.postId !== post.id) return;
@@ -93,6 +145,7 @@ const SinglePost = ({ post, firstAlphabet = "U", onImageClick, onRetweet }) => {
     };
 
     socket.on("postDeleted", updatePostsList);
+    fetchAnalytics();
     return () => socket.off("postDeleted", updatePostsList);
   }, [socket, post?.id]);
 
@@ -128,7 +181,7 @@ const SinglePost = ({ post, firstAlphabet = "U", onImageClick, onRetweet }) => {
         </div>
 
         <div className="post-text" onClick={(e) => handlePostClick(e, post.id)}>
-          {post.text || post.content}
+          {((post.text || post.content) || '').replace(/#\w+/g, '').trim()}
         </div>
 
         <PollShowComponent post={post} />
@@ -142,10 +195,51 @@ const SinglePost = ({ post, firstAlphabet = "U", onImageClick, onRetweet }) => {
             <i className="fas fa-comment"></i>
             <span>{post.comments}</span>
           </div>
-          <div className="action-item" onClick={() => onRetweet(post.id)}>
+          {/* <div className="action-item" onClick={() => onRetweet(post.id)}>
             <i className="fas fa-retweet"></i>
             <span>{post.retweets}</span>
-          </div>
+          </div> */}
+
+            <div className="post-detail-action retweet-wrapper">
+              <FaRetweet
+                className="post-detail-icon"
+                onClick={() => setShowRetweetMenu(!showRetweetMenu)}
+              />
+              <span>{post.retweet_count ?? 0}</span>
+
+
+              {showRetweetMenu && (
+                <div className="retweet-menu">
+                  <div
+                    className="retweet-menu-item"
+                    onClick={handleRepost}
+                  >
+                    <FaRetweet className="retweet-menu-icon" />
+                    <span>Repost</span>
+                  </div>
+                  <div
+                    className="retweet-menu-item"
+                    onClick={() => {
+                      setRetweetSource(analytics);
+                      setShowComposer(true);
+                      setShowRetweetMenu(false);
+                    }}
+                  >
+                    <FaQuoteRight className="retweet-menu-icon" />
+                    <span>Quote</span>
+                  </div>
+                </div>
+              )}
+            </div>
+            {showComposer && (
+                      <>
+                        <div className="composer-backdrop" onClick={() => setShowComposer(false)} />
+                        <PostComposer
+                          onClose={() => setShowComposer(false)}
+                          originalPost={retweetSource}
+                        />
+                      </>
+                    )}
 
           <PostLikeComponent className={"action-item"} post={post} />
 
