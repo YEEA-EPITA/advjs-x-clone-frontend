@@ -181,7 +181,7 @@ const ExplorePage = () => {
                 <div className="search-results-page">
                     {/* Search Tabs */}
                     <div className="search-tabs-main">
-                        {['Top', 'Latest', 'People', 'Media', 'Lists'].map(tab => (
+                        {['Top', 'Latest', 'People'].map(tab => (
                             <button
                                 key={tab}
                                 className={`search-tab-main ${activeTab === tab ? 'active' : ''}`}

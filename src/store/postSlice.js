@@ -18,7 +18,7 @@ export const createPost = createAsyncThunk(
 
       const res = await xcloneApi.post(postRequests.createPost, formData, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
+          Authorization: `Bearer ${JSON.parse(localStorage.getItem("user"))?.token}`,
         },
       });
 

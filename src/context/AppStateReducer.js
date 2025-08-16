@@ -9,6 +9,7 @@ const AppStateReducer = (state, action) => {
 
     case "Logout":
       localStorage.removeItem("user");
+      localStorage.removeItem("pollVotes");
       return {
         ...state,
         isAuthenticated: false,
@@ -28,6 +29,16 @@ const AppStateReducer = (state, action) => {
         posts: {
           list: action.payload.list || [],
           pagination: action.payload.pagination || {},
+        },
+      };
+
+    case "UPDATE_POST_LIST_AFTER_CREATE":
+      return {
+        ...state,
+
+        posts: {
+          ...state.posts,
+          list: [action.payload, ...state.posts.list],
         },
       };
 
