@@ -117,13 +117,13 @@ const SinglePost = ({ post, firstAlphabet = "U", onImageClick, onRetweet }) => {
   // socket event listener for post deletion
   useEffect(() => {
 
-
-    if (!socket || !post?.id) return;
-
+    if (!socket || !post?.id || post.type !== 'retweet') return;
 
     const fetchAnalytics = async () => {
       try {
-        const response = await xcloneApi.get(postRequests.postAnalytics(post.id));
+        // For retweets, we might want to fetch analytics of the original post
+        const postIdToFetch = post.type === 'retweet' && post.originalPost ? post.originalPost.id : post.id;
+        const response = await xcloneApi.get(postRequests.postAnalytics(postIdToFetch));
         if (response.data.success) {
           setAnalytics(response.data.analytics);
         }
@@ -152,6 +152,131 @@ const SinglePost = ({ post, firstAlphabet = "U", onImageClick, onRetweet }) => {
 
   // Check if current user can delete this post (either own post or admin)
   const canDelete = post.userId === user.userId;
+
+  // Check if this is a retweet
+  console.log("Post type:", post.type);
+  console.log("Original post exists:", post.originalPost);
+  const isRetweet = post.type === 'retweet' && post.originalPost;
+  
+  // Debug logging
+  console.log("Post data:", {
+    id: post.id,
+    type: post.type,
+    hasOriginalPost: !!post.originalPost,
+    isRetweet: isRetweet,
+    retweeterUsername: post.retweeterUsername
+  });
+
+  // If it's a retweet, render the retweet UI
+  if (isRetweet) {
+    console.log("Rendering retweet post");
+    const originalPost = post.originalPost;
+    const retweeterUsername = post.retweeterUsername;
+    const retweetComment = post.retweetComment;
+    const retweetedAt = post.retweetedAt;
+    
+    // Helper function to format date safely
+    const formatRetweetDate = (dateString) => {
+      if (!dateString) return '';
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return '';
+      return date.toLocaleString();
+    };
+    
+    const retweetTimeString = formatRetweetDate(retweetedAt);
+    
+    return (
+      <div className="post retweet-post">
+        {/* Retweet indicator */}
+        <div className="retweet-indicator">
+          <FaRetweet className="retweet-icon" />
+          <span className="retweet-text">{retweeterUsername} retweeted</span>
+          {retweetTimeString && <span className="retweet-time">· {retweetTimeString}</span>}
+        </div>
+        
+        {/* Retweet comment section - main content area like a regular post */}
+        {retweetComment && (
+          <div className="retweet-comment">
+            <div className="compose-avatar">
+              <div className="avatar-placeholder">
+                {retweeterUsername?.charAt(0)?.toUpperCase() || 'U'}
+              </div>
+            </div>
+            <div className="retweet-comment-content">
+              <div className="post-header">
+                <span className="post-username">@{retweeterUsername}</span>
+                {retweetTimeString && <span className="post-time">· {retweetTimeString}</span>}
+              </div>
+              <div className="retweet-comment-text">{retweetComment}</div>
+            </div>
+          </div>
+        )}
+        
+        {/* Original post content - embedded as quoted tweet */}
+        <div className="original-post-wrapper" onClick={(e) => handlePostClick(e, originalPost.id)}>
+          <div className="compose-avatar">
+            <div className="avatar-placeholder">
+              {originalPost.username?.charAt(0)?.toUpperCase() || 'U'}
+            </div>
+          </div>
+          <div className="post-content">
+            <div className="post-header">
+              <span className="post-username">@{originalPost.username}</span>
+              {formatRetweetDate(originalPost.created_at) && (
+                <span className="post-time">· {formatRetweetDate(originalPost.created_at)}</span>
+              )}
+              {originalPost.location && originalPost.location !== "Unknown" && (
+                <span className="post-location">📍 {originalPost.location}</span>
+              )}
+            </div>
+
+            <div className="post-text">
+              {((originalPost.content) || '').replace(/#\w+/g, '').trim()}
+            </div>
+
+            <PostTags hashtags={originalPost.hashtags} mentions={originalPost.mentions} />
+            <PostMedia mediaUrls={originalPost.media_urls} onImageClick={onImageClick} />
+          </div>
+        </div>
+
+        {/* Modals */}
+        {showComposer && (
+          <>
+            <div className="composer-backdrop" onClick={() => setShowComposer(false)} />
+            <PostComposer
+              onClose={() => setShowComposer(false)}
+              originalPost={retweetSource}
+            />
+          </>
+        )}
+
+        {/* Delete Confirmation Modal - for retweets */}
+        <ConfirmationModal
+          isOpen={showDeleteConfirm}
+          onClose={handleCancelDelete}
+          onConfirm={handleConfirmDelete}
+          title="Delete Retweet?"
+          message="This will remove your retweet, but the original post will remain."
+          confirmText={loading ? "Deleting..." : "Delete"}
+          cancelText="Cancel"
+          type="danger"
+          loading={loading}
+          disableCancel={loading}
+        />
+
+        {/* Custom Alert Modal */}
+        <AlertModal
+          isOpen={showAlert}
+          onClose={handleCloseAlert}
+          title={alertConfig.title}
+          message={alertConfig.message}
+          type={alertConfig.type}
+        />
+      </div>
+    );
+  }
+
+  // Regular post UI
   return (
     <div className="post">
       <div className="compose-avatar">
