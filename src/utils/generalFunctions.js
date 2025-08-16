@@ -36,6 +36,27 @@ const transformedPosts = (feed) => {
     poll: feed.poll,
     media_urls: feed.media_urls,
     liked_by_me: feed.liked_by_me,
+    type: feed.type || 'post', // Default to 'post' if type is not provided
+    originalPost: feed.originalPost, // For retweets
+    retweeterUsername: feed.retweeterUsername, // For retweets
+    retweeterId: feed.retweeterId, // For retweets
+    retweeterName: feed.retweeterName, // For retweets
+    retweeterAvatar: feed.retweeterAvatar, // For retweets
+    retweeterUserId: feed.retweeterUserId, // For retweets
+    retweetId: feed.retweetId, // For retweets
+    retweetCreatedAt: feed.retweetCreatedAt, // For retweets
+    retweetCount: feed.retweetCount, // For retweets
+    retweetLikedByMe: feed.retweetLikedByMe, // For retweets
+    retweetLikeCount: feed.retweetLikeCount, // For retweets
+    retweetCommentCount: feed.retweetCommentCount, // For retweets
+    retweetMediaUrls: feed.retweetMediaUrls, // For retweets
+    retweetPoll: feed.retweetPoll, // For retweets
+    retweetHashtags: feed.retweetHashtags, // For retweets
+    retweetMentions: feed.retweetMentions, // For retweets
+    retweetLocation: feed.retweetLocation, // For retweets
+    retweetText: feed.retweetText, // For retweets
+    retweetTime: formatTimeAgo(feed.retweetCreatedAt), // For retweets
+    retweetType: feed.retweetType || 'retweet', // Default to 'ret
   };
 };
 

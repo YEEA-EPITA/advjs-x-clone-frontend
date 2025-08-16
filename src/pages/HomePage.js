@@ -23,6 +23,10 @@ const HomePage = () => {
 
   const posts = appState.posts?.list || [];
 
+  // Debug: Check posts data
+  console.log("HomePage posts:", posts);
+  console.log("AppState.posts:", appState.posts);
+
   const fetchLiveFeeds = async () => {
     try {
       setLoading(true);
@@ -150,15 +154,33 @@ const HomePage = () => {
             </div>
           </div>
         ) : (
-          posts?.map((post) => (
-            <SinglePost
-              key={post.id}
-              post={post}
-              firstAlphabet={post.username?.charAt(0) || "U"}
-              onImageClick={handleImageClick}
-              onRetweet={handleRetweet}
-            />
-          ))
+          posts?.map((post) => {
+            // Handle retweet posts
+            console.log("Rendering post:", post);
+            if (post.type === 'retweet') {
+              console.log("Rendering retweet post: 123", post);
+              return (
+                <SinglePost
+                  key={post.originalPost?.id ? `retweet-${post.originalPost.id}-${post.retweeterUsername || 'unknown'}` : `retweet-${Math.floor(Math.random() * 1000) + 1001}`}
+                  post={post}
+                  firstAlphabet={post.retweeterUsername?.charAt(0)?.toUpperCase() || "U"}
+                  onImageClick={handleImageClick}
+                  onRetweet={handleRetweet}
+                />
+              );
+            }
+            
+            // Handle regular posts
+            return (
+              <SinglePost
+                key={post.id}
+                post={post}
+                firstAlphabet={post.username?.charAt(0) || "U"}
+                onImageClick={handleImageClick}
+                onRetweet={handleRetweet}
+              />
+            );
+          })
         )}
       </div>
 
