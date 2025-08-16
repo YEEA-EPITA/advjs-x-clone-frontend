@@ -120,6 +120,7 @@ const SinglePost = ({ post, firstAlphabet = "U", onImageClick, onRetweet }) => {
 
     if (!socket || !post?.id) return;
 
+
     const fetchAnalytics = async () => {
       try {
         const response = await xcloneApi.get(postRequests.postAnalytics(post.id));
@@ -205,7 +206,7 @@ const SinglePost = ({ post, firstAlphabet = "U", onImageClick, onRetweet }) => {
                 className="post-detail-icon"
                 onClick={() => setShowRetweetMenu(!showRetweetMenu)}
               />
-              <span>{post.retweet_count ?? 0}</span>
+              <span>{post.retweet_count ?? post.retweets ?? 0}</span>
 
 
               {showRetweetMenu && (
