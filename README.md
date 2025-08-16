@@ -25,7 +25,7 @@
 <b>3. Composer</b>
 - #Posts #Hashtags #Mentions #Polls  
 - React Hook Form + Yup for form validation.  
-- Post composer supports text, media upload, automatic, and polls.
+- Post composer supports text, media upload, automatic location, and polls.
 
 <b>4. PWA</b>
 - #OfflineFirst #Caching  
@@ -130,13 +130,17 @@ Frontend Architecture Overview:
 
 * **Entry**: `src/index.js` → `<BrowserRouter>` + Redux `<Provider>` + `AppStateProvider` + service worker registration
 * **Routing**:
-
   * Public: `/`, `/auth`
   * Private: `/home`, `/notifications`, `/posts/:id`, `/explore`, `/messages`, `/profile`, `/more`
 * **State Management**: Redux Toolkit (`postSlice`) + Context (`AppStateProvider/Reducer`)
 * **API Layer**: `axios.js` instance with token interceptor, `requests.js` for endpoints
 * **Realtime**: Socket.IO connection lifecycle managed in `AppStateProvider`
 * **PWA**: `service-worker.js` caches static + API GET responses, offline fallback page
+
+
+
+![Service Architecture Diagram](https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdna%2FbYnJ2J%2FbtsPUEGnaSl%2FAAAAAAAAAAAAAAAAAAAAANXSksMxc7iiYO78YVKNPQ5SMtl8i6QtFu1-ntHArVA2%2Fimg.png%3Fcredential%3DyqXZFxpELC7KVnFOS48ylbz2pIh7yKj8%26expires%3D1756652399%26allow_ip%3D%26allow_referer%3D%26signature%3DXkCihym6ediDjuuqk%252BJSsddmUIA%253D)
+
 
 <br>
 
@@ -203,6 +207,11 @@ src/
 | - Socket.IO events for posts & notifications <br> - Auto connect/disconnect on auth state | - Static & API GET cache <br> - Offline fallback page |
 
 
+
+<br><br>
+
+# Frontend Vercel App
+- https://advjs-x-clone-frontend.vercel.app
 
 <br><br>
 
